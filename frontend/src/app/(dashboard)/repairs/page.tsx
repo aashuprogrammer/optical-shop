@@ -1013,27 +1013,38 @@ export default function RepairsPage() {
                 fontSize: '13px',
               }}
             >
-              {/* Header */}
-              <div style={{ textAlign: 'center', borderBottom: '1px solid #000', paddingBottom: '10px', marginBottom: '10px' }}>
-                <h2 style={{ fontSize: '18px', fontWeight: 800, margin: 0, textTransform: 'uppercase' }}>
-                  {shop?.name || 'OptiSuite Optical Shop'}
-                </h2>
-                <p style={{ margin: '2px 0', fontSize: '12px', color: '#333' }}>
-                  {shop?.address_line1 || ''}{shop?.city ? `, ${shop.city}` : ''} | Ph: {shop?.phone || ''}
-                </p>
-                <div
-                  style={{
-                    display: 'inline-block',
-                    padding: '2px 10px',
-                    backgroundColor: '#000',
-                    color: '#fff',
-                    fontWeight: 700,
-                    fontSize: '11px',
-                    borderRadius: '3px',
-                    marginTop: '4px',
-                  }}
-                >
-                  REPAIR & SERVICE JOB SLIP
+              {/* Header: Left Logo, Center Divya Optical Shop, Right S.No */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '2px solid #000', paddingBottom: '10px', marginBottom: '12px', gap: '10px' }}>
+                <img
+                  src={shop?.logo_url || '/logo.png'}
+                  alt={shop?.name || 'Divya Optical Shop'}
+                  style={{ width: '56px', height: '56px', objectFit: 'contain', borderRadius: '50%', border: '1px solid #ccc' }}
+                />
+                <div style={{ textAlign: 'center', flex: 1 }}>
+                  <h2 style={{ fontSize: '16px', fontWeight: 800, margin: 0, textTransform: 'uppercase' }}>
+                    {shop?.name || 'Divya Optical Shop'}
+                  </h2>
+                  <p style={{ margin: '2px 0', fontSize: '11px', color: '#333' }}>
+                    {shop?.address_line1 || ''}{shop?.city ? `, ${shop.city}` : ''} | Ph: {shop?.phone || '+91 9876543210'}
+                  </p>
+                  <div
+                    style={{
+                      display: 'inline-block',
+                      padding: '2px 8px',
+                      backgroundColor: '#000',
+                      color: '#fff',
+                      fontWeight: 700,
+                      fontSize: '10px',
+                      borderRadius: '3px',
+                      marginTop: '2px',
+                    }}
+                  >
+                    REPAIR & SERVICE JOB SLIP
+                  </div>
+                </div>
+                <div style={{ textAlign: 'right', minWidth: '100px' }}>
+                  <div style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', color: '#666' }}>Job S.No</div>
+                  <div style={{ fontSize: '14px', fontWeight: 800, fontFamily: 'monospace' }}>#{selectedRepair.repair_number}</div>
                 </div>
               </div>
 

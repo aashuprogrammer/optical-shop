@@ -31,6 +31,7 @@ export interface Shop {
   currency_symbol?: string;
   default_tax_rate?: string | number;
   optometrist_name?: string;
+  authorized_signatory?: string;
   eye_testing_fee?: string | number;
   terms_and_conditions?: string;
   language?: string;

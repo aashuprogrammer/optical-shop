@@ -3,14 +3,14 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { OpticalCalculatorModal } from './OpticalCalculatorModal';
+import { MobileNavDrawer } from './MobileNavDrawer';
 import { api } from '../lib/api';
 import {
   PlusCircle,
-  Calculator,
   User as UserIcon,
   LogOut,
   Sparkles,
+  Menu,
 } from 'lucide-react';
 import { Shop, User } from '../lib/types';
 
@@ -18,7 +18,7 @@ export const Header: React.FC = () => {
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [shop, setShop] = useState<Shop | null>(null);
-  const [isCalcOpen, setIsCalcOpen] = useState<boolean>(false);
+  const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState<boolean>(false);
 
   const loadUserData = () => {
     const storedUser = localStorage.getItem('optisuite_user');
@@ -47,11 +47,16 @@ export const Header: React.FC = () => {
 
     // Listen for custom user profile updates
     const handleProfileUpdate = () => loadUserData();
+    const handleOpenMobileMenu = () => setIsMobileDrawerOpen(true);
+
     window.addEventListener('user_profile_updated', handleProfileUpdate);
     window.addEventListener('auth_user_updated', handleProfileUpdate);
+    window.addEventListener('open_mobile_nav', handleOpenMobileMenu);
+
     return () => {
       window.removeEventListener('user_profile_updated', handleProfileUpdate);
       window.removeEventListener('auth_user_updated', handleProfileUpdate);
+      window.removeEventListener('open_mobile_nav', handleOpenMobileMenu);
     };
   }, []);
 
@@ -66,6 +71,17 @@ export const Header: React.FC = () => {
     <>
       <header className="app-header">
         <div className="header-left">
+          {/* Mobile Hamburger Menu Toggle */}
+          <button
+            type="button"
+            className="btn-icon mobile-menu-toggle"
+            onClick={() => setIsMobileDrawerOpen(true)}
+            aria-label="Open Full Navigation Menu"
+            title="All Features & Navigation"
+          >
+            <Menu size={20} />
+          </button>
+
           <div className="shop-badge">
             <Sparkles size={18} className="shop-sparkle-icon" />
             <span className="shop-name-text">{shop?.name || 'OptiSuite'}</span>
@@ -73,17 +89,6 @@ export const Header: React.FC = () => {
         </div>
 
         <div className="header-right">
-          {/* Optical Calculator Quick Tool */}
-          <button
-            className="btn btn-secondary btn-sm header-calc-btn"
-            onClick={() => setIsCalcOpen(true)}
-            title="Optical Formulas (Transpose, CL Converter)"
-            aria-label="Optical Calculator"
-          >
-            <Calculator size={15} />
-            <span className="calc-btn-text">Rx Tool</span>
-          </button>
-
           {/* New POS Order Quick Action */}
           <Link href="/orders/new" className="btn btn-primary btn-sm header-order-btn">
             <PlusCircle size={15} />
@@ -116,8 +121,13 @@ export const Header: React.FC = () => {
         </div>
       </header>
 
-      {/* Optical formulas modal */}
-      <OpticalCalculatorModal isOpen={isCalcOpen} onClose={() => setIsCalcOpen(false)} />
+      {/* Mobile Slide-Over Navigation Drawer */}
+      <MobileNavDrawer
+        isOpen={isMobileDrawerOpen}
+        onClose={() => setIsMobileDrawerOpen(false)}
+        shop={shop}
+        user={user}
+      />
     </>
   );
 };
