@@ -1,0 +1,72 @@
+services:
+  # 1. PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: optisuite_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: optiuser
+      POSTGRES_PASSWORD: optipassword123
+      POSTGRES_DB: optisuite_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./db/migrations/000001_init_schema.up.sql:/docker-entrypoint-initdb.d/000001_init_schema.up.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U optiuser -d optisuite_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # 2. Self-Hosted LibreTranslate (For free & offline English -> Hindi translation)
+  libretranslate:
+    image: libretranslate/libretranslate:latest
+    container_name: optisuite_translate
+    restart: unless-stopped
+    environment:
+      LT_LOAD_ONLY: en,hi
+      LT_DISABLE_WEB_UI: "True"
+    ports:
+      - "5000:5000"
+
+  # 3. Go Backend Server
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: optisuite_backend
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      libretranslate:
+        condition: service_started
+    environment:
+      PORT: 8080
+      DATABASE_URL: postgres://optiuser:optipassword123@postgres:5432/optisuite_db?sslmode=disable
+      TOKEN_SYMMETRIC_KEY: "01234567890123456789012345678901"
+      TOKEN_DURATION: 24h
+      TRANSLATION_SERVICE_URL: http://libretranslate:5000
+    ports:
+      - "8080:8080"
+
+  # 4. Next.js Frontend App
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: http://backend:8080
+    container_name: optisuite_frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    environment:
+      NEXT_PUBLIC_API_URL: http://backend:8080
+    ports:
+      - "3000:3000"
+
+volumes:
+  postgres_data:
+    driver: local

@@ -1,0 +1,5 @@
+.git
+bin
+tmp
+frontend/node_modules
+frontend/.next
