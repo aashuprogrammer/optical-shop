@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { useTranslation } from '@/lib/i18n/TranslationContext';
 import { api } from '@/lib/api';
 import { PrescriptionWheelPicker } from '@/components/PrescriptionWheelPicker';
 import { CameraCaptureModal } from '@/components/CameraCaptureModal';
@@ -97,7 +96,6 @@ interface OnlyLensItem {
 }
 
 export default function NewOrderPage() {
-  const { t } = useTranslation();
   const router = useRouter();
 
   // General App State

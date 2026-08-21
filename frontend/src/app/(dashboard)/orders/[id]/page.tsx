@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { useTranslation } from '@/lib/i18n/TranslationContext';
 import { OrderStepper } from '@/components/OrderStepper';
 import { InvoiceView } from '@/components/InvoiceView';
 import { LabReceiptView } from '@/components/LabReceiptView';
@@ -24,7 +23,6 @@ import { Order, OrderItem, OrderPayment, OrderPrescription, OrderStatusHistory, 
 export default function OrderDetailPage() {
   const params = useParams();
   const router = useRouter();
-  const { t } = useTranslation();
   const orderId = Number(params?.id);
 
   const [order, setOrder] = useState<Order | null>(null);

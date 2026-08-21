@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { useTranslation } from '@/lib/i18n/TranslationContext';
 import { api } from '@/lib/api';
 import {
   IndianRupee,
@@ -21,7 +20,6 @@ import {
 import { DashboardStats, Order } from '@/lib/types';
 
 export default function DashboardPage() {
-  const { t } = useTranslation();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [dueOrders, setDueOrders] = useState<Order[]>([]);
   const [chartData, setChartData] = useState<any[]>([]);

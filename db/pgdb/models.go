@@ -376,16 +376,6 @@ type StockMovement struct {
 	CreatedAt     pgtype.Timestamptz `json:"created_at"`
 }
 
-type TranslationCache struct {
-	ID             int64              `json:"id"`
-	SourceText     string             `json:"source_text"`
-	SourceLang     string             `json:"source_lang"`
-	TargetLang     string             `json:"target_lang"`
-	TranslatedText string             `json:"translated_text"`
-	CreatedAt      pgtype.Timestamptz `json:"created_at"`
-	UpdatedAt      pgtype.Timestamptz `json:"updated_at"`
-}
-
 type User struct {
 	ID              int64              `json:"id"`
 	ShopID          int64              `json:"shop_id"`

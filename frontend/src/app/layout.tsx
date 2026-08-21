@@ -1,6 +1,5 @@
 import './globals.css';
 import type { Metadata } from 'next';
-import { TranslationProvider } from '@/lib/i18n/TranslationContext';
 
 export const metadata: Metadata = {
   title: 'OptiSuite - Optical Shop Management System',
@@ -14,9 +13,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>
-        <TranslationProvider>{children}</TranslationProvider>
-      </body>
+      <body>{children}</body>
     </html>
   );
 }

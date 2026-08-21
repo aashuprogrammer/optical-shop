@@ -19,9 +19,8 @@ type Config struct {
 	R2Endpoint            string
 	R2BucketName          string
 	R2PublicURL           string
-	ProfilesFolder        string
-	TranslationServiceURL string
-	CORSOrigins           []string
+	ProfilesFolder    string
+	CORSOrigins       []string
 }
 
 func LoadConfig() *Config {
@@ -51,18 +50,17 @@ func LoadConfig() *Config {
 	}
 
 	return &Config{
-		Port:                  port,
-		DatabaseURL:           dbURL,
-		TokenSymmetricKey:     tokenKey,
-		TokenDuration:         duration,
-		R2AccessKeyID:         getEnv("R2_ACCESS_KEY_ID", ""),
-		R2SecretAccessKey:     getEnv("R2_SECRET_ACCESS_KEY", ""),
-		R2Endpoint:            getEnv("R2_ENDPOINT", ""),
-		R2BucketName:          getEnv("R2_BUCKET_NAME", "optical-shop"),
-		R2PublicURL:           getEnv("R2_PUBLIC_URL", ""),
-		ProfilesFolder:        getEnv("PROFILES_FOLDER", "profiles"),
-		TranslationServiceURL: getEnv("TRANSLATION_SERVICE_URL", "http://localhost:5001"),
-		CORSOrigins:           corsOrigins,
+		Port:              port,
+		DatabaseURL:       dbURL,
+		TokenSymmetricKey: tokenKey,
+		TokenDuration:     duration,
+		R2AccessKeyID:     getEnv("R2_ACCESS_KEY_ID", ""),
+		R2SecretAccessKey: getEnv("R2_SECRET_ACCESS_KEY", ""),
+		R2Endpoint:        getEnv("R2_ENDPOINT", ""),
+		R2BucketName:      getEnv("R2_BUCKET_NAME", "optical-shop"),
+		R2PublicURL:       getEnv("R2_PUBLIC_URL", ""),
+		ProfilesFolder:    getEnv("PROFILES_FOLDER", "profiles"),
+		CORSOrigins:       corsOrigins,
 	}
 }
 

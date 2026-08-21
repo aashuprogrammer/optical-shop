@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useTranslation } from '@/lib/i18n/TranslationContext';
 import { Modal } from '@/components/Modal';
 import { api } from '@/lib/api';
 import {
@@ -30,7 +29,6 @@ const STATUS_TABS = [
 ];
 
 export default function OrdersPage() {
-  const { t } = useTranslation();
   const [orders, setOrders] = useState<Order[]>([]);
   const [status, setStatus] = useState<string>('all');
   const [paymentStatus, setPaymentStatus] = useState<string>('all');

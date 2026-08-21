@@ -2,13 +2,10 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useTranslation } from '@/lib/i18n/TranslationContext';
-import { LanguageSelector } from '@/components/LanguageSelector';
 import { api } from '@/lib/api';
 import { Glasses, Lock, User, AlertCircle, Loader2 } from 'lucide-react';
 
 export default function LoginPage() {
-  const { t } = useTranslation();
   const router = useRouter();
   const [username, setUsername] = useState('admin');
   const [password, setPassword] = useState('admin123');
@@ -27,10 +24,10 @@ export default function LoginPage() {
         localStorage.setItem('optisuite_user', JSON.stringify(res.data.user));
         router.push('/dashboard');
       } else {
-        setError(res.error || t('Invalid username or password.'));
+        setError(res.error || 'Invalid username or password.');
       }
     } catch (err: any) {
-      setError(t('Failed to connect to backend server.'));
+      setError('Failed to connect to backend server.');
     } finally {
       setIsLoading(false);
     }
@@ -48,10 +45,6 @@ export default function LoginPage() {
         position: 'relative',
       }}
     >
-      <div style={{ position: 'absolute', top: '16px', right: '16px' }}>
-        <LanguageSelector />
-      </div>
-
       <div
         className="card"
         style={{
@@ -82,7 +75,7 @@ export default function LoginPage() {
             OptiSuite
           </h1>
           <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '4px' }}>
-            {t('Optical Shop Management System')}
+            Optical Shop Management System
           </p>
         </div>
 
@@ -108,7 +101,7 @@ export default function LoginPage() {
 
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label className="form-label">{t('Username')}</label>
+            <label className="form-label">Username</label>
             <div style={{ position: 'relative' }}>
               <User
                 size={16}
@@ -124,7 +117,7 @@ export default function LoginPage() {
                 type="text"
                 className="form-input"
                 style={{ paddingLeft: '36px' }}
-                placeholder={t('Enter username')}
+                placeholder="Enter username"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 required
@@ -133,7 +126,7 @@ export default function LoginPage() {
           </div>
 
           <div className="form-group" style={{ marginBottom: '20px' }}>
-            <label className="form-label">{t('Password')}</label>
+            <label className="form-label">Password</label>
             <div style={{ position: 'relative' }}>
               <Lock
                 size={16}
@@ -149,7 +142,7 @@ export default function LoginPage() {
                 type="password"
                 className="form-input"
                 style={{ paddingLeft: '36px' }}
-                placeholder={t('Enter password')}
+                placeholder="Enter password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
@@ -165,10 +158,10 @@ export default function LoginPage() {
           >
             {isLoading ? (
               <>
-                <Loader2 size={16} className="spin" /> {t('Signing in...')}
+                <Loader2 size={16} className="spin" /> Signing in...
               </>
             ) : (
-              t('Sign In to Dashboard')
+              'Sign In to Dashboard'
             )}
           </button>
         </form>
@@ -185,7 +178,7 @@ export default function LoginPage() {
           }}
         >
           <p>
-            {t('Default credentials')}: <strong>admin</strong> / <strong>admin123</strong>
+            Default credentials: <strong>admin</strong> / <strong>admin123</strong>
           </p>
         </div>
       </div>

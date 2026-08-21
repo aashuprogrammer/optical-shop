@@ -48,8 +48,6 @@ type Querier interface {
 	DeleteProductImage(ctx context.Context, id int64) error
 	DeleteRepair(ctx context.Context, arg DeleteRepairParams) error
 	DeleteUser(ctx context.Context, id int64) error
-	GetAllTranslationsForLanguage(ctx context.Context, arg GetAllTranslationsForLanguageParams) ([]GetAllTranslationsForLanguageRow, error)
-	GetBatchTranslations(ctx context.Context, arg GetBatchTranslationsParams) ([]GetBatchTranslationsRow, error)
 	GetCustomerByID(ctx context.Context, arg GetCustomerByIDParams) (Customer, error)
 	GetCustomerCities(ctx context.Context, shopID int64) ([]pgtype.Text, error)
 	GetCustomerStats(ctx context.Context, shopID int64) (GetCustomerStatsRow, error)
@@ -74,7 +72,6 @@ type Querier interface {
 	GetStockValuationSummary(ctx context.Context, shopID int64) (GetStockValuationSummaryRow, error)
 	GetTopSellingProducts(ctx context.Context, arg GetTopSellingProductsParams) ([]GetTopSellingProductsRow, error)
 	GetTotalPaidForOrder(ctx context.Context, orderID int64) (pgtype.Numeric, error)
-	GetTranslation(ctx context.Context, arg GetTranslationParams) (TranslationCache, error)
 	GetUserByID(ctx context.Context, id int64) (User, error)
 	GetUserByUsername(ctx context.Context, username string) (User, error)
 	GetVendorByID(ctx context.Context, arg GetVendorByIDParams) (Vendor, error)
@@ -128,7 +125,6 @@ type Querier interface {
 	UpdateVendor(ctx context.Context, arg UpdateVendorParams) (Vendor, error)
 	UpdateVendorBalance(ctx context.Context, arg UpdateVendorBalanceParams) error
 	UpsertShopSetting(ctx context.Context, arg UpsertShopSettingParams) (ShopSetting, error)
-	UpsertTranslation(ctx context.Context, arg UpsertTranslationParams) (TranslationCache, error)
 }
 
 var _ Querier = (*Queries)(nil)

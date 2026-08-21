@@ -3,7 +3,6 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useTranslation } from '../lib/i18n/TranslationContext';
 import {
   LayoutDashboard,
   Users,
@@ -14,7 +13,6 @@ import {
 
 export const BottomNav: React.FC = () => {
   const pathname = usePathname();
-  const { t } = useTranslation();
 
   const handleOpenMore = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -37,7 +35,7 @@ export const BottomNav: React.FC = () => {
         className={`bottom-nav-item ${pathname === '/dashboard' ? 'active' : ''}`}
       >
         <LayoutDashboard size={20} />
-        <span>{t('Home')}</span>
+        <span>Home</span>
       </Link>
 
       <Link
@@ -45,11 +43,11 @@ export const BottomNav: React.FC = () => {
         className={`bottom-nav-item ${pathname.startsWith('/customers') ? 'active' : ''}`}
       >
         <Users size={20} />
-        <span>{t('Customers')}</span>
+        <span>Customers</span>
       </Link>
 
       {/* Floating Action Button in Center */}
-      <Link href="/orders/new" className="bottom-nav-item bottom-nav-item-fab" title={t('Create POS Order')}>
+      <Link href="/orders/new" className="bottom-nav-item bottom-nav-item-fab" title="Create POS Order">
         <Plus size={24} />
       </Link>
 
@@ -58,7 +56,7 @@ export const BottomNav: React.FC = () => {
         className={`bottom-nav-item ${pathname.startsWith('/orders') && pathname !== '/orders/new' ? 'active' : ''}`}
       >
         <ShoppingBag size={20} />
-        <span>{t('Orders')}</span>
+        <span>Orders</span>
       </Link>
 
       {/* Full Features Drawer Trigger */}
@@ -67,10 +65,10 @@ export const BottomNav: React.FC = () => {
         onClick={handleOpenMore}
         className={`bottom-nav-item ${isMoreActive ? 'active' : ''}`}
         style={{ background: 'none', border: 'none', cursor: 'pointer' }}
-        title={t('All Features & More')}
+        title="All Features & More"
       >
         <Menu size={20} />
-        <span>{t('More')}</span>
+        <span>More</span>
       </button>
     </nav>
   );

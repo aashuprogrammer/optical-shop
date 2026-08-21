@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { useTranslation } from '../lib/i18n/TranslationContext';
 
 interface WheelPickerProps {
   isOpen: boolean;
@@ -27,8 +26,6 @@ export const PrescriptionWheelPicker: React.FC<WheelPickerProps> = ({
   onClose,
   allowPlano = true,
 }) => {
-  const { t } = useTranslation();
-
   const [selectedSign, setSelectedSign] = useState<string>('+');
   const [selectedInt, setSelectedInt] = useState<number>(0);
   const [selectedFrac, setSelectedFrac] = useState<string>('.00');
@@ -162,7 +159,7 @@ export const PrescriptionWheelPicker: React.FC<WheelPickerProps> = ({
           }}
         >
           <h3 style={{ fontSize: '1.1rem', fontWeight: 700, margin: 0, color: '#f8fafc' }}>
-            {t(title)}
+            {title}
           </h3>
           <div
             style={{
@@ -372,7 +369,7 @@ export const PrescriptionWheelPicker: React.FC<WheelPickerProps> = ({
             textAlign: 'center',
           }}
         >
-          <span style={{ fontSize: '0.85rem', color: '#94a3b8' }}>{t('Selected Power')}: </span>
+          <span style={{ fontSize: '0.85rem', color: '#94a3b8' }}>Selected Power: </span>
           <span style={{ fontSize: '1.2rem', fontWeight: 800, color: '#38bdf8' }}>
             {selectedSign === 'PLANO'
               ? 'PLANO'
@@ -405,7 +402,7 @@ export const PrescriptionWheelPicker: React.FC<WheelPickerProps> = ({
               letterSpacing: '0.05em',
             }}
           >
-            {t('CLEAR')}
+            CLEAR
           </button>
           <button
             type="button"
@@ -423,7 +420,7 @@ export const PrescriptionWheelPicker: React.FC<WheelPickerProps> = ({
               letterSpacing: '0.05em',
             }}
           >
-            {t('OK')}
+            OK
           </button>
         </div>
       </div>

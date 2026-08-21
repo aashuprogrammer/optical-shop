@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import { useTranslation } from '../lib/i18n/TranslationContext';
 import { Check, Clock, Eye, Wrench, PackageCheck, Truck } from 'lucide-react';
 
 interface OrderStepperProps {
@@ -17,8 +16,6 @@ const STEPS = [
 ];
 
 export const OrderStepper: React.FC<OrderStepperProps> = ({ currentStatus }) => {
-  const { t } = useTranslation();
-
   const getStepIndex = (status: string) => {
     if (status === 'cancelled') return -1;
     const index = STEPS.findIndex((s) => s.key === status);
@@ -40,7 +37,7 @@ export const OrderStepper: React.FC<OrderStepperProps> = ({ currentStatus }) => 
           border: '1px solid var(--danger-border)',
         }}
       >
-        {t('This order has been CANCELLED and items returned to stock.')}
+        This order has been CANCELLED and items returned to stock.
       </div>
     );
   }
@@ -61,7 +58,7 @@ export const OrderStepper: React.FC<OrderStepperProps> = ({ currentStatus }) => 
               <div className="step-circle">
                 {isCompleted ? <Check size={18} /> : <Icon size={18} />}
               </div>
-              <span className="step-label">{t(step.label)}</span>
+              <span className="step-label">{step.label}</span>
             </div>
           );
         })}

@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import { useTranslation } from '../lib/i18n/TranslationContext';
 import { Printer, Download, ArrowLeft, Stethoscope, Building2 } from 'lucide-react';
 import { Order, OrderItem, OrderPrescription, Shop } from '../lib/types';
 import { api } from '../lib/api';
@@ -21,7 +20,6 @@ export const InvoiceView: React.FC<InvoiceViewProps> = ({
   shop,
   onBack,
 }) => {
-  const { t } = useTranslation();
   const [signatory, setSignatory] = React.useState<string>(shop?.authorized_signatory || '');
 
   React.useEffect(() => {
@@ -73,17 +71,17 @@ export const InvoiceView: React.FC<InvoiceViewProps> = ({
       >
         {onBack ? (
           <button className="btn btn-secondary btn-sm" onClick={onBack}>
-            <ArrowLeft size={16} /> {t('Back to Order')}
+            <ArrowLeft size={16} /> Back to Order
           </button>
         ) : (
           <div />
         )}
         <div style={{ display: 'flex', gap: '10px' }}>
-          <button className="btn btn-secondary" onClick={handleDownloadPDF} title={t('Download PDF format')}>
-            <Download size={16} /> {t('Download PDF')}
+          <button className="btn btn-secondary" onClick={handleDownloadPDF} title="Download PDF format">
+            <Download size={16} /> Download PDF
           </button>
-          <button className="btn btn-primary" onClick={handlePrint} title={t('Print receipt or invoice')}>
-            <Printer size={16} /> {t('Print Invoice')}
+          <button className="btn btn-primary" onClick={handlePrint} title="Print receipt or invoice">
+            <Printer size={16} /> Print Invoice
           </button>
         </div>
       </div>
@@ -111,7 +109,7 @@ export const InvoiceView: React.FC<InvoiceViewProps> = ({
               {shop?.city ? `, ${shop.city}` : ''}{shop?.state ? ` - ${shop.state}` : ''} {shop?.pin_code ? `(${shop.pin_code})` : ''}
             </p>
             <p style={{ fontSize: '0.82rem', color: '#475569', margin: '2px 0' }}>
-              📞 {t('Phone')}: {shop?.phone || '+91 9876543210'} &nbsp;|&nbsp; ✉️ {t('Email')}: {shop?.email || 'contact@divyaoptical.com'}
+              📞 Phone: {shop?.phone || '+91 9876543210'} &nbsp;|&nbsp; ✉️ Email: {shop?.email || 'contact@divyaoptical.com'}
             </p>
             {shop?.gstin && (
               <p style={{ fontSize: '0.82rem', fontWeight: 700, color: '#0f172a', margin: '2px 0' }}>
@@ -131,9 +129,9 @@ export const InvoiceView: React.FC<InvoiceViewProps> = ({
               </span>
             </div>
             <div style={{ fontSize: '0.8rem', color: '#64748b', marginTop: '6px', textAlign: 'right' }}>
-              <div><strong>{t('Date')}:</strong> {new Date(order.created_at || Date.now()).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</div>
+              <div><strong>Date:</strong> {new Date(order.created_at || Date.now()).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</div>
               {order.expected_delivery && (
-                <div style={{ marginTop: '2px' }}><strong>{t('Delivery Due')}:</strong> {new Date(order.expected_delivery).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</div>
+                <div style={{ marginTop: '2px' }}><strong>Delivery Due:</strong> {new Date(order.expected_delivery).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</div>
               )}
             </div>
           </div>
@@ -143,29 +141,29 @@ export const InvoiceView: React.FC<InvoiceViewProps> = ({
         <div className="invoice-meta-grid" style={{ marginBottom: '18px' }}>
           <div style={{ padding: '12px', backgroundColor: 'var(--bg-muted)', borderRadius: 'var(--radius-md)' }}>
             <h4 style={{ fontSize: '0.8rem', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '4px' }}>
-              {t('Customer Details')}
+              Customer Details
             </h4>
             <p style={{ fontWeight: 700, fontSize: '0.95rem' }}>
               {order.first_name} {order.last_name || ''}
             </p>
             <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-              {t('Phone')}: {order.customer_phone || 'N/A'}
+              Phone: {order.customer_phone || 'N/A'}
             </p>
             {order.customer_city && (
               <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-                {t('City')}: {order.customer_city}
+                City: {order.customer_city}
               </p>
             )}
           </div>
 
           <div style={{ padding: '12px', backgroundColor: 'var(--bg-muted)', borderRadius: 'var(--radius-md)' }}>
             <h4 style={{ fontSize: '0.8rem', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '4px' }}>
-              {t('Eye Examination & Specialist')}
+              Eye Examination & Specialist
             </h4>
             {prescription?.checkup_by_type === 'dr' ? (
               <div>
                 <p style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--primary-hover)' }}>
-                  👨‍⚕️ {prescription.doctor_name || t('Doctor Prescription')}
+                  👨‍⚕️ {prescription.doctor_name || 'Doctor Prescription'}
                 </p>
                 <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>
                   {prescription.hospital_name ? `${prescription.hospital_name}` : ''}
@@ -184,7 +182,7 @@ export const InvoiceView: React.FC<InvoiceViewProps> = ({
               </div>
             )}
             <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '4px' }}>
-              <strong>{t('Payment Status')}:</strong> <span style={{ textTransform: 'capitalize' }}>{order.payment_status}</span>
+              <strong>Payment Status:</strong> <span style={{ textTransform: 'capitalize' }}>{order.payment_status}</span>
             </p>
           </div>
         </div>
@@ -194,29 +192,29 @@ export const InvoiceView: React.FC<InvoiceViewProps> = ({
           <div style={{ marginBottom: '20px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
               <h3 style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--primary-hover)', margin: 0 }}>
-                {t('Prescription Matrix (Refraction Data)')}
+                Prescription Matrix (Refraction Data)
               </h3>
               {prescription.total_pd && Number(prescription.total_pd) > 0 && (
                 <span style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--primary)' }}>
-                  {t('Total PD')}: {prescription.total_pd} mm
+                  Total PD: {prescription.total_pd} mm
                 </span>
               )}
             </div>
             <table className="rx-table">
               <thead>
                 <tr>
-                  <th>{t('Eye')}</th>
-                  <th>{t('SPH')}</th>
-                  <th>{t('CYL')}</th>
-                  <th>{t('AXIS')}</th>
-                  <th>{t('V.A.')}</th>
-                  <th>{t('ADD')}</th>
-                  <th>{t('PD (mm)')}</th>
+                  <th>Eye</th>
+                  <th>SPH</th>
+                  <th>CYL</th>
+                  <th>AXIS</th>
+                  <th>V.A.</th>
+                  <th>ADD</th>
+                  <th>PD (mm)</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
-                  <td className="eye-label">{t('OD (Right)')}</td>
+                  <td className="eye-label">OD (Right)</td>
                   <td style={{ fontWeight: 700 }}>{formatPowerDisplay(prescription.re_sph)}</td>
                   <td style={{ fontWeight: 700 }}>{formatPowerDisplay(prescription.re_cyl)}</td>
                   <td>{prescription.re_axis ? `${prescription.re_axis}°` : '-'}</td>
@@ -225,7 +223,7 @@ export const InvoiceView: React.FC<InvoiceViewProps> = ({
                   <td>{prescription.re_pd || '-'}</td>
                 </tr>
                 <tr>
-                  <td className="eye-label">{t('OS (Left)')}</td>
+                  <td className="eye-label">OS (Left)</td>
                   <td style={{ fontWeight: 700 }}>{formatPowerDisplay(prescription.le_sph)}</td>
                   <td style={{ fontWeight: 700 }}>{formatPowerDisplay(prescription.le_cyl)}</td>
                   <td>{prescription.le_axis ? `${prescription.le_axis}°` : '-'}</td>
@@ -250,19 +248,19 @@ export const InvoiceView: React.FC<InvoiceViewProps> = ({
                 }}
               >
                 {prescription.lens_for && (
-                  <span><strong>{t('Lens For')}:</strong> {prescription.lens_for}</span>
+                  <span><strong>Lens For:</strong> {prescription.lens_for}</span>
                 )}
                 {prescription.lens_type && (
-                  <span><strong>{t('Lens Type')}:</strong> {prescription.lens_type}</span>
+                  <span><strong>Lens Type:</strong> {prescription.lens_type}</span>
                 )}
                 {prescription.lens_company && (
-                  <span><strong>{t('Brand')}:</strong> {prescription.lens_company} {prescription.lens_product || ''}</span>
+                  <span><strong>Brand:</strong> {prescription.lens_company} {prescription.lens_product || ''}</span>
                 )}
                 {prescription.lens_index && (
-                  <span><strong>{t('Index')}:</strong> {prescription.lens_index}</span>
+                  <span><strong>Index:</strong> {prescription.lens_index}</span>
                 )}
                 {prescription.lens_dia && (
-                  <span><strong>{t('Dia')}:</strong> {prescription.lens_dia} mm</span>
+                  <span><strong>Dia:</strong> {prescription.lens_dia} mm</span>
                 )}
               </div>
             )}
@@ -275,11 +273,11 @@ export const InvoiceView: React.FC<InvoiceViewProps> = ({
             <thead>
               <tr>
                 <th>#</th>
-                <th>{t('Description / Item')}</th>
-                <th>{t('HSN')}</th>
-                <th style={{ textAlign: 'center' }}>{t('Qty')}</th>
-                <th style={{ textAlign: 'right' }}>{t('Unit Price')}</th>
-                <th style={{ textAlign: 'right' }}>{t('Amount')}</th>
+                <th>Description / Item</th>
+                <th>HSN</th>
+                <th style={{ textAlign: 'center' }}>Qty</th>
+                <th style={{ textAlign: 'right' }}>Unit Price</th>
+                <th style={{ textAlign: 'right' }}>Amount</th>
               </tr>
             </thead>
             <tbody>
@@ -304,12 +302,12 @@ export const InvoiceView: React.FC<InvoiceViewProps> = ({
         <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '24px' }}>
           <div style={{ width: '280px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.88rem' }}>
-              <span style={{ color: 'var(--text-muted)' }}>{t('Subtotal')}:</span>
+              <span style={{ color: 'var(--text-muted)' }}>Subtotal:</span>
               <span>{currency}{Number(order.subtotal).toFixed(2)}</span>
             </div>
             {Number(order.discount_amount) > 0 && (
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.88rem', color: 'var(--danger)' }}>
-                <span>{t('Discount')}:</span>
+                <span>Discount:</span>
                 <span>-{currency}{Number(order.discount_amount).toFixed(2)}</span>
               </div>
             )}
@@ -325,11 +323,11 @@ export const InvoiceView: React.FC<InvoiceViewProps> = ({
                 color: 'var(--primary-hover)',
               }}
             >
-              <span>{t('Grand Total')}:</span>
+              <span>Grand Total:</span>
               <span>{currency}{Number(order.grand_total).toFixed(2)}</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.9rem', color: 'var(--success)', fontWeight: 600 }}>
-              <span>{t('Amount Paid')}:</span>
+              <span>Amount Paid:</span>
               <span>{currency}{Number(order.amount_paid).toFixed(2)}</span>
             </div>
             <div
@@ -341,7 +339,7 @@ export const InvoiceView: React.FC<InvoiceViewProps> = ({
                 fontWeight: 700,
               }}
             >
-              <span>{t('Balance Due')}:</span>
+              <span>Balance Due:</span>
               <span>{currency}{Number(order.balance_due).toFixed(2)}</span>
             </div>
           </div>
@@ -350,7 +348,7 @@ export const InvoiceView: React.FC<InvoiceViewProps> = ({
         {/* Footer Terms & Signature */}
         <div style={{ borderTop: '1px solid var(--border)', paddingTop: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
           <div style={{ maxWidth: '60%' }}>
-            <h5 style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '4px' }}>{t('Terms & Conditions')}:</h5>
+            <h5 style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '4px' }}>Terms & Conditions:</h5>
             <p style={{ fontSize: '0.72rem', color: 'var(--text-subtle)', lineHeight: 1.4 }}>
               {shop?.terms_and_conditions ||
                 '1. Goods once sold will not be taken back.\n2. Warranty covers manufacturing defects only on frames/coatings.\n3. Please inspect power and fitting at the time of delivery.'}
@@ -364,7 +362,7 @@ export const InvoiceView: React.FC<InvoiceViewProps> = ({
             </div>
             <div style={{ borderTop: '1.5px solid #334155', width: '100%', paddingTop: '4px' }}>
               <p style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', color: '#334155', margin: 0, letterSpacing: '0.04em' }}>
-                {t('Authorized Signatory')}
+                Authorized Signatory
               </p>
               <p style={{ fontSize: '0.72rem', color: '#64748b', margin: '2px 0 0 0', fontWeight: 500 }}>
                 {signatory || shop?.authorized_signatory || 'Divya Maurya'}

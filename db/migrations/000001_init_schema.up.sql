@@ -477,20 +477,7 @@ CREATE TABLE IF NOT EXISTS shop_settings (
 
 CREATE UNIQUE INDEX IF NOT EXISTS idx_shop_settings_key ON shop_settings(shop_id, setting_key);
 
--- 22. TRANSLATION CACHE (Dynamic Multilingual Translation Storage)
-CREATE TABLE IF NOT EXISTS translation_cache (
-    id BIGSERIAL PRIMARY KEY,
-    source_text TEXT NOT NULL,
-    source_lang VARCHAR(5) NOT NULL DEFAULT 'en',
-    target_lang VARCHAR(5) NOT NULL,
-    translated_text TEXT NOT NULL,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
-);
-
-CREATE UNIQUE INDEX IF NOT EXISTS idx_translation_cache_lookup ON translation_cache(source_lang, target_lang, MD5(source_text));
-
--- 23. REPAIRS & SERVICES (Frame Repair & Lens Change Records)
+-- 22. REPAIRS & SERVICES (Frame Repair & Lens Change Records)
 CREATE TABLE IF NOT EXISTS repairs (
     id BIGSERIAL PRIMARY KEY,
     shop_id BIGINT NOT NULL REFERENCES shops(id) ON DELETE CASCADE,

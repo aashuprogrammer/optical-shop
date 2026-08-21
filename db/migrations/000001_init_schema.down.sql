@@ -1,5 +1,4 @@
 -- Drop all tables in reverse dependency order
-DROP TABLE IF EXISTS translation_cache CASCADE;
 DROP TABLE IF EXISTS shop_settings CASCADE;
 DROP TABLE IF EXISTS activity_logs CASCADE;
 DROP TABLE IF EXISTS expenses CASCADE;

@@ -3,7 +3,6 @@
 import React, { useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { useTranslation } from '../lib/i18n/TranslationContext';
 import { api } from '../lib/api';
 import {
   X,
@@ -40,7 +39,6 @@ export const MobileNavDrawer: React.FC<MobileNavDrawerProps> = ({
 }) => {
   const pathname = usePathname();
   const router = useRouter();
-  const { t } = useTranslation();
 
   // Close drawer on path change
   useEffect(() => {
@@ -179,7 +177,7 @@ export const MobileNavDrawer: React.FC<MobileNavDrawerProps> = ({
         <div className="mobile-drawer-body">
           {NAV_SECTIONS.map((sec, sIdx) => (
             <div key={sIdx} className="mobile-drawer-section">
-              <span className="mobile-drawer-section-title">{t(sec.title)}</span>
+              <span className="mobile-drawer-section-title">{sec.title}</span>
               <div className="mobile-drawer-links">
                 {sec.items.map((item) => {
                   const isActive = pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href));
@@ -196,7 +194,7 @@ export const MobileNavDrawer: React.FC<MobileNavDrawerProps> = ({
                         <div className={`mobile-drawer-icon-wrap ${isActive ? 'active' : ''}`}>
                           <Icon size={18} />
                         </div>
-                        <span className="mobile-drawer-label">{t(item.label)}</span>
+                        <span className="mobile-drawer-label">{item.label}</span>
                       </div>
 
                       <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -224,7 +222,7 @@ export const MobileNavDrawer: React.FC<MobileNavDrawerProps> = ({
             style={{ width: '100%', justifyContent: 'center', color: 'var(--danger)', borderColor: 'var(--danger-border, #fca5a5)' }}
           >
             <LogOut size={16} />
-            <span>{t('Log Out of Store')}</span>
+            <span>Log Out of Store</span>
           </button>
         </div>
       </div>

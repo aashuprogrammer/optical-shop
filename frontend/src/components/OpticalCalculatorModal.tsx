@@ -2,7 +2,6 @@
 
 import React, { useState } from 'react';
 import { Modal } from './Modal';
-import { useTranslation } from '../lib/i18n/TranslationContext';
 import { api } from '../lib/api';
 import { Calculator, ArrowRightLeft, Eye } from 'lucide-react';
 
@@ -15,7 +14,6 @@ export const OpticalCalculatorModal: React.FC<OpticalCalculatorModalProps> = ({
   isOpen,
   onClose,
 }) => {
-  const { t } = useTranslation();
   const [mode, setMode] = useState<'transpose' | 'cl'>('transpose');
 
   // Transpose state
@@ -51,7 +49,7 @@ export const OpticalCalculatorModal: React.FC<OpticalCalculatorModalProps> = ({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title={t('Optical Formulas & Calculations')}>
+    <Modal isOpen={isOpen} onClose={onClose} title="Optical Formulas & Calculations">
       <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
         <button
           className={`btn ${mode === 'transpose' ? 'btn-primary' : 'btn-secondary'}`}
@@ -59,7 +57,7 @@ export const OpticalCalculatorModal: React.FC<OpticalCalculatorModalProps> = ({
           onClick={() => setMode('transpose')}
         >
           <ArrowRightLeft size={16} />
-          {t('Lens Transposition')}
+          Lens Transposition
         </button>
         <button
           className={`btn ${mode === 'cl' ? 'btn-primary' : 'btn-secondary'}`}
@@ -67,18 +65,18 @@ export const OpticalCalculatorModal: React.FC<OpticalCalculatorModalProps> = ({
           onClick={() => setMode('cl')}
         >
           <Eye size={16} />
-          {t('Spectacle to Contact Lens')}
+          Spectacle to Contact Lens
         </button>
       </div>
 
       {mode === 'transpose' ? (
         <div>
           <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '14px' }}>
-            {t('Convert between Plus (+) and Minus (-) cylinder prescription formats automatically.')}
+            Convert between Plus (+) and Minus (-) cylinder prescription formats automatically.
           </p>
           <div className="grid-cols-3">
             <div className="form-group">
-              <label className="form-label">{t('Sphere (SPH)')}</label>
+              <label className="form-label">Sphere (SPH)</label>
               <input
                 type="number"
                 step="0.25"
@@ -88,7 +86,7 @@ export const OpticalCalculatorModal: React.FC<OpticalCalculatorModalProps> = ({
               />
             </div>
             <div className="form-group">
-              <label className="form-label">{t('Cylinder (CYL)')}</label>
+              <label className="form-label">Cylinder (CYL)</label>
               <input
                 type="number"
                 step="0.25"
@@ -98,7 +96,7 @@ export const OpticalCalculatorModal: React.FC<OpticalCalculatorModalProps> = ({
               />
             </div>
             <div className="form-group">
-              <label className="form-label">{t('Axis (°)')}</label>
+              <label className="form-label">Axis (°)</label>
               <input
                 type="number"
                 min="1"
@@ -110,7 +108,7 @@ export const OpticalCalculatorModal: React.FC<OpticalCalculatorModalProps> = ({
             </div>
           </div>
           <button className="btn btn-primary" style={{ width: '100%', marginTop: '10px' }} onClick={handleTranspose}>
-            <Calculator size={16} /> {t('Calculate Transposition')}
+            <Calculator size={16} /> Calculate Transposition
           </button>
 
           {tResult && (
@@ -123,13 +121,13 @@ export const OpticalCalculatorModal: React.FC<OpticalCalculatorModalProps> = ({
                 border: '1px solid var(--primary-border)',
               }}
             >
-              <h4 style={{ color: 'var(--primary-hover)', marginBottom: '8px' }}>{t('Transposed Rx')}</h4>
+              <h4 style={{ color: 'var(--primary-hover)', marginBottom: '8px' }}>Transposed Rx</h4>
               <p style={{ fontSize: '1.1rem', fontWeight: 700 }}>
                 SPH: {tResult.sph > 0 ? `+${tResult.sph.toFixed(2)}` : tResult.sph.toFixed(2)} | CYL:{' '}
                 {tResult.cyl > 0 ? `+${tResult.cyl.toFixed(2)}` : tResult.cyl.toFixed(2)} | AXIS: {tResult.axis}°
               </p>
               <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '4px' }}>
-                {t('Spherical Equivalent')}: {tResult.spherical_equivalent > 0 ? `+${tResult.spherical_equivalent.toFixed(2)}` : tResult.spherical_equivalent.toFixed(2)} D
+                Spherical Equivalent: {tResult.spherical_equivalent > 0 ? `+${tResult.spherical_equivalent.toFixed(2)}` : tResult.spherical_equivalent.toFixed(2)} D
               </p>
             </div>
           )}
@@ -137,11 +135,11 @@ export const OpticalCalculatorModal: React.FC<OpticalCalculatorModalProps> = ({
       ) : (
         <div>
           <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '14px' }}>
-            {t('Calculate effective contact lens power compensating for vertex distance (standard 12mm).')}
+            Calculate effective contact lens power compensating for vertex distance (standard 12mm).
           </p>
           <div className="grid-cols-2">
             <div className="form-group">
-              <label className="form-label">{t('Spectacle SPH (D)')}</label>
+              <label className="form-label">Spectacle SPH (D)</label>
               <input
                 type="number"
                 step="0.25"
@@ -151,7 +149,7 @@ export const OpticalCalculatorModal: React.FC<OpticalCalculatorModalProps> = ({
               />
             </div>
             <div className="form-group">
-              <label className="form-label">{t('Spectacle CYL (D)')}</label>
+              <label className="form-label">Spectacle CYL (D)</label>
               <input
                 type="number"
                 step="0.25"
@@ -163,7 +161,7 @@ export const OpticalCalculatorModal: React.FC<OpticalCalculatorModalProps> = ({
           </div>
           <div className="grid-cols-2">
             <div className="form-group">
-              <label className="form-label">{t('Axis (°)')}</label>
+              <label className="form-label">Axis (°)</label>
               <input
                 type="number"
                 min="1"
@@ -174,7 +172,7 @@ export const OpticalCalculatorModal: React.FC<OpticalCalculatorModalProps> = ({
               />
             </div>
             <div className="form-group">
-              <label className="form-label">{t('Vertex Distance (mm)')}</label>
+              <label className="form-label">Vertex Distance (mm)</label>
               <input
                 type="number"
                 min="8"
@@ -186,7 +184,7 @@ export const OpticalCalculatorModal: React.FC<OpticalCalculatorModalProps> = ({
             </div>
           </div>
           <button className="btn btn-primary" style={{ width: '100%', marginTop: '10px' }} onClick={handleCLConvert}>
-            <Calculator size={16} /> {t('Convert to Contact Lens Power')}
+            <Calculator size={16} /> Convert to Contact Lens Power
           </button>
 
           {clResult && (
@@ -199,13 +197,13 @@ export const OpticalCalculatorModal: React.FC<OpticalCalculatorModalProps> = ({
                 border: '1px solid var(--success-border)',
               }}
             >
-              <h4 style={{ color: 'var(--success)', marginBottom: '8px' }}>{t('Recommended Contact Lens Power')}</h4>
+              <h4 style={{ color: 'var(--success)', marginBottom: '8px' }}>Recommended Contact Lens Power</h4>
               <p style={{ fontSize: '1.1rem', fontWeight: 700 }}>
                 SPH: {clResult.cl_sph > 0 ? `+${clResult.cl_sph.toFixed(2)}` : clResult.cl_sph.toFixed(2)} | CYL:{' '}
                 {clResult.cl_cyl > 0 ? `+${clResult.cl_cyl.toFixed(2)}` : clResult.cl_cyl.toFixed(2)} | AXIS: {clResult.cl_axis}°
               </p>
               <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '4px' }}>
-                {t('Spherical Equivalent CL')}: {clResult.cl_spherical_equivalent > 0 ? `+${clResult.cl_spherical_equivalent.toFixed(2)}` : clResult.cl_spherical_equivalent.toFixed(2)} D
+                Spherical Equivalent CL: {clResult.cl_spherical_equivalent > 0 ? `+${clResult.cl_spherical_equivalent.toFixed(2)}` : clResult.cl_spherical_equivalent.toFixed(2)} D
               </p>
             </div>
           )}
