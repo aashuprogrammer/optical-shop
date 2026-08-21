@@ -88,6 +88,7 @@ export default function SettingsPage() {
     currency_symbol: '₹',
     default_tax_rate: 18,
     optometrist_name: '',
+    authorized_signatory: '',
     eye_testing_fee: 100,
     terms_and_conditions: '',
   });
@@ -131,6 +132,11 @@ export default function SettingsPage() {
 
     if (shopRes.success && shopRes.data) {
       setShop(shopRes.data);
+      const signatory =
+        (settingsRes.success && settingsRes.data?.authorized_signatory) ||
+        shopRes.data.authorized_signatory ||
+        'Divya Maurya';
+
       setShopForm({
         name: shopRes.data.name || '',
         phone: shopRes.data.phone || '',
@@ -146,6 +152,7 @@ export default function SettingsPage() {
         currency_symbol: shopRes.data.currency_symbol || '₹',
         default_tax_rate: Number(shopRes.data.default_tax_rate) || 18,
         optometrist_name: shopRes.data.optometrist_name || '',
+        authorized_signatory: signatory,
         eye_testing_fee: Number(shopRes.data.eye_testing_fee) || 100,
         terms_and_conditions: shopRes.data.terms_and_conditions || '',
       });
@@ -194,7 +201,10 @@ export default function SettingsPage() {
 
   const handleUpdateShop = async (e: React.FormEvent) => {
     e.preventDefault();
-    const res = await api.updateShop(shopForm);
+    const [res] = await Promise.all([
+      api.updateShop(shopForm),
+      api.upsertSetting('authorized_signatory', shopForm.authorized_signatory),
+    ]);
     if (res.success) {
       setIsSaved(true);
       setTimeout(() => setIsSaved(false), 3000);
@@ -581,6 +591,53 @@ export default function SettingsPage() {
                     value={shopForm.default_tax_rate}
                     onChange={(e) => setShopForm({ ...shopForm, default_tax_rate: parseFloat(e.target.value) || 18 })}
                   />
+                </div>
+              </div>
+
+              {/* Authorized Signatory Field with Signature Style Preview */}
+              <div className="grid-cols-2" style={{ backgroundColor: 'var(--bg-muted)', padding: '14px', borderRadius: 'var(--radius-md)', marginBottom: '14px', border: '1px solid var(--border)' }}>
+                <div className="form-group" style={{ marginBottom: 0 }}>
+                  <label className="form-label" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <span>Authorized Signatory Name</span>
+                    <span className="badge badge-ready" style={{ fontSize: '0.68rem', padding: '2px 6px' }}>Receipt Footer</span>
+                  </label>
+                  <input
+                    type="text"
+                    className="form-input"
+                    placeholder="e.g. Divya Maurya / Anurag Maurya"
+                    value={shopForm.authorized_signatory}
+                    onChange={(e) => setShopForm({ ...shopForm, authorized_signatory: e.target.value })}
+                  />
+                  <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)', marginTop: '4px', display: 'block' }}>
+                    This name will appear on both Customer and Lab Receipts in a professional signature font.
+                  </span>
+                </div>
+                <div className="form-group" style={{ marginBottom: 0 }}>
+                  <label className="form-label">Signature Font Appearance</label>
+                  <div
+                    style={{
+                      height: '42px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      padding: '0 14px',
+                      backgroundColor: '#ffffff',
+                      borderRadius: 'var(--radius-md)',
+                      border: '1.5px dashed var(--primary-border)',
+                      boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.03)',
+                    }}
+                  >
+                    <span
+                      style={{
+                        fontFamily: "'Dancing Script', 'Caveat', 'Great Vibes', cursive",
+                        fontSize: '1.45rem',
+                        fontWeight: 700,
+                        color: '#1e3a8a',
+                        letterSpacing: '0.02em',
+                      }}
+                    >
+                      {shopForm.authorized_signatory || 'Divya Maurya'}
+                    </span>
+                  </div>
                 </div>
               </div>
 

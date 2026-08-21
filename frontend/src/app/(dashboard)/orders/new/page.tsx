@@ -26,6 +26,8 @@ import {
   Percent,
   X,
   Upload,
+  Edit,
+  Save,
 } from 'lucide-react';
 import { Customer, Product, Shop } from '@/lib/types';
 
@@ -107,6 +109,7 @@ export default function NewOrderPage() {
   const [lensTypeList, setLensTypeList] = useState<string[]>(DEFAULT_LENS_TYPE_OPTIONS);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [isCustCameraOpen, setIsCustCameraOpen] = useState<boolean>(false);
+  const [cameraTarget, setCameraTarget] = useState<'new' | 'edit'>('new');
 
   // SECTION 1: CUSTOMER
   const [custSearch, setCustSearch] = useState<string>('');
@@ -124,7 +127,25 @@ export default function NewOrderPage() {
     city: '',
     profile_image_url: '',
   });
+
+  // Customer Update State (when selectedCustomer is being updated)
+  const [isEditingCustomer, setIsEditingCustomer] = useState<boolean>(false);
+  const [editCustomerForm, setEditCustomerForm] = useState({
+    first_name: '',
+    last_name: '',
+    phone: '',
+    email: '',
+    age: '',
+    gender: 'male',
+    date_of_birth: '',
+    address_line1: '',
+    city: '',
+    profile_image_url: '',
+  });
+  const [isUpdatingCust, setIsUpdatingCust] = useState<boolean>(false);
+
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const editFileInputRef = useRef<HTMLInputElement>(null);
 
   const calculateAge = (dobStr?: string): string => {
     if (!dobStr) return '';
@@ -156,6 +177,102 @@ export default function NewOrderPage() {
       setCustomerForm((prev) => ({ ...prev, date_of_birth: dobStr, age }));
     } else {
       setCustomerForm((prev) => ({ ...prev, date_of_birth: '', age: '' }));
+    }
+  };
+
+  const handleStartEditCustomer = () => {
+    if (!selectedCustomer) return;
+    const age = calculateAge(selectedCustomer.date_of_birth);
+    setEditCustomerForm({
+      first_name: selectedCustomer.first_name || '',
+      last_name: selectedCustomer.last_name || '',
+      phone: selectedCustomer.phone || '',
+      email: selectedCustomer.email || '',
+      age: age,
+      gender: selectedCustomer.gender || 'male',
+      date_of_birth: selectedCustomer.date_of_birth || '',
+      address_line1: selectedCustomer.address_line1 || '',
+      city: selectedCustomer.city || '',
+      profile_image_url: selectedCustomer.profile_image_url || '',
+    });
+    setIsEditingCustomer(true);
+  };
+
+  const handleEditAgeChange = (ageStr: string) => {
+    const ageNum = parseInt(ageStr, 10);
+    if (!isNaN(ageNum) && ageNum >= 0 && ageNum <= 125) {
+      const today = new Date();
+      const birthYear = today.getFullYear() - ageNum;
+      const dob = `${birthYear}-01-01`;
+      setEditCustomerForm((prev) => ({ ...prev, age: ageStr, date_of_birth: dob }));
+    } else {
+      setEditCustomerForm((prev) => ({ ...prev, age: ageStr, date_of_birth: '' }));
+    }
+  };
+
+  const handleEditDobChange = (dobStr: string) => {
+    if (dobStr) {
+      const age = calculateAge(dobStr);
+      setEditCustomerForm((prev) => ({ ...prev, date_of_birth: dobStr, age }));
+    } else {
+      setEditCustomerForm((prev) => ({ ...prev, date_of_birth: '', age: '' }));
+    }
+  };
+
+  const handleSaveCustomerUpdate = async () => {
+    if (!selectedCustomer) return;
+    if (!editCustomerForm.first_name.trim()) {
+      alert('Please enter customer first name.');
+      return;
+    }
+    if (!editCustomerForm.phone.trim()) {
+      alert('Please enter customer mobile phone number.');
+      return;
+    }
+
+    setIsUpdatingCust(true);
+    try {
+      const payload = {
+        ...selectedCustomer,
+        first_name: editCustomerForm.first_name.trim(),
+        last_name: editCustomerForm.last_name.trim(),
+        phone: editCustomerForm.phone.trim(),
+        email: editCustomerForm.email.trim(),
+        date_of_birth: editCustomerForm.date_of_birth || null,
+        gender: editCustomerForm.gender,
+        address_line1: editCustomerForm.address_line1.trim(),
+        city: editCustomerForm.city.trim(),
+        profile_image_url: editCustomerForm.profile_image_url || '',
+      };
+
+      const res = await api.updateCustomer(selectedCustomer.id, payload);
+      if (res.success && res.data) {
+        const updated = res.data;
+        setSelectedCustomer(updated);
+        setCustomerForm((prev) => ({
+          ...prev,
+          first_name: updated.first_name,
+          last_name: updated.last_name || '',
+          phone: updated.phone || '',
+          email: updated.email || '',
+          age: calculateAge(updated.date_of_birth),
+          gender: updated.gender || 'male',
+          date_of_birth: updated.date_of_birth || '',
+          address_line1: updated.address_line1 || '',
+          city: updated.city || '',
+          profile_image_url: updated.profile_image_url || '',
+        }));
+        setCustomers((prev) =>
+          prev.map((c) => (c.id === updated.id ? updated : c))
+        );
+        setIsEditingCustomer(false);
+      } else {
+        alert(res.error || 'Failed to update customer details.');
+      }
+    } catch (e: any) {
+      alert(e.message || 'Error updating customer');
+    } finally {
+      setIsUpdatingCust(false);
     }
   };
 
@@ -801,13 +918,25 @@ export default function NewOrderPage() {
               <h2 style={{ fontSize: '1.15rem', fontWeight: 700, margin: 0 }}>{t('Customer Section')}</h2>
             </div>
             {selectedCustomer && (
-              <button
-                type="button"
-                className="btn btn-secondary btn-sm"
-                onClick={handleClearCustomer}
-              >
-                <X size={14} /> {t('Change Customer')}
-              </button>
+              <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                {!isEditingCustomer && (
+                  <button
+                    type="button"
+                    className="btn btn-secondary btn-sm"
+                    onClick={handleStartEditCustomer}
+                    title="Update customer Name, Age, Phone, Photo"
+                  >
+                    <Edit size={14} /> {t('Edit / Update Details')}
+                  </button>
+                )}
+                <button
+                  type="button"
+                  className="btn btn-secondary btn-sm"
+                  onClick={handleClearCustomer}
+                >
+                  <X size={14} /> {t('Change Customer')}
+                </button>
+              </div>
             )}
           </div>
 
@@ -884,82 +1013,285 @@ export default function NewOrderPage() {
             </div>
           )}
 
-          {/* Selected Customer Active Banner */}
+          {/* Selected Customer Active Banner or Edit Form */}
           {selectedCustomer ? (
-            <div
-              style={{
-                backgroundColor: 'var(--primary-subtle)',
-                border: '1px solid var(--primary-border)',
-                borderRadius: 'var(--radius-lg)',
-                padding: '16px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '16px',
-              }}
-            >
+            isEditingCustomer ? (
+              /* Inline Editable Form for Existing Customer */
               <div
                 style={{
-                  width: '56px',
-                  height: '56px',
-                  borderRadius: 'var(--radius-full)',
-                  backgroundColor: 'var(--primary)',
-                  color: '#fff',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontWeight: 800,
-                  fontSize: '1.3rem',
-                  overflow: 'hidden',
+                  backgroundColor: 'var(--bg-card)',
+                  border: '1.5px solid var(--primary-border)',
+                  borderRadius: 'var(--radius-lg)',
+                  padding: '18px',
+                  boxShadow: 'var(--shadow-sm)',
                 }}
               >
-                {selectedCustomer.profile_image_url ? (
-                  <img
-                    src={selectedCustomer.profile_image_url}
-                    alt={selectedCustomer.first_name}
-                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                  />
-                ) : (
-                  selectedCustomer.first_name.charAt(0).toUpperCase()
-                )}
-              </div>
-              <div style={{ flex: 1 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                  <h3 style={{ fontSize: '1.1rem', fontWeight: 700, margin: 0 }}>
-                    {selectedCustomer.first_name} {selectedCustomer.last_name}
-                  </h3>
-                  <span className="badge badge-ready" style={{ fontSize: '0.72rem' }}>
-                    <UserCheck size={12} /> Existing Customer
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px', borderBottom: '1px solid var(--border)', paddingBottom: '10px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <Edit size={16} color="var(--primary)" />
+                    <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 700 }}>
+                      {t('Update Customer Details')}
+                    </h3>
+                  </div>
+                  <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+                    ID: #{selectedCustomer.id}
                   </span>
-                  {selectedCustomer.gender && (
-                    <span className="badge badge-in_lab" style={{ fontSize: '0.72rem', textTransform: 'capitalize' }}>
-                      {selectedCustomer.gender}
-                    </span>
-                  )}
-                  {selectedCustomer.date_of_birth && (
-                    <span className="badge badge-fitting" style={{ fontSize: '0.72rem' }}>
-                      Age: {calculateAge(selectedCustomer.date_of_birth)} yrs
-                    </span>
+                </div>
+
+                <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', alignItems: 'flex-start' }}>
+                  {/* Photo & Snapshot for Edit */}
+                  <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px' }}>
+                    <div
+                      onClick={() => {
+                        setCameraTarget('edit');
+                        setIsCustCameraOpen(true);
+                      }}
+                      style={{
+                        width: '84px',
+                        height: '84px',
+                        borderRadius: 'var(--radius-lg)',
+                        border: '2px dashed var(--border)',
+                        backgroundColor: 'var(--bg-muted)',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        cursor: 'pointer',
+                        overflow: 'hidden',
+                        position: 'relative',
+                      }}
+                      title="Change or take customer photo"
+                    >
+                      {editCustomerForm.profile_image_url ? (
+                        <img
+                          src={editCustomerForm.profile_image_url}
+                          alt="Customer Photo"
+                          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                        />
+                      ) : (
+                        <>
+                          <Camera size={22} color="var(--primary)" />
+                          <span style={{ fontSize: '0.68rem', color: 'var(--primary)', fontWeight: 600, marginTop: '4px' }}>
+                            Photo
+                          </span>
+                        </>
+                      )}
+                    </div>
+
+                    {editCustomerForm.profile_image_url ? (
+                      <button
+                        type="button"
+                        className="btn btn-secondary btn-sm"
+                        style={{ fontSize: '0.72rem', padding: '3px 8px', color: 'var(--danger)', borderColor: 'var(--danger-border, #fca5a5)' }}
+                        onClick={() => setEditCustomerForm((prev) => ({ ...prev, profile_image_url: '' }))}
+                        title="Remove customer photo"
+                      >
+                        <Trash2 size={12} /> Remove
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        className="btn btn-secondary btn-sm"
+                        style={{ fontSize: '0.72rem', padding: '3px 8px' }}
+                        onClick={() => {
+                          setCameraTarget('edit');
+                          setIsCustCameraOpen(true);
+                        }}
+                      >
+                        <Camera size={12} /> Add Photo
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Name, Phone, Age, Gender, City Inputs */}
+                  <div style={{ flex: 1, minWidth: '260px' }}>
+                    <div className="grid-cols-2">
+                      <div className="form-group">
+                        <label className="form-label">First Name *</label>
+                        <input
+                          type="text"
+                          className="form-input"
+                          required
+                          value={editCustomerForm.first_name}
+                          onChange={(e) => setEditCustomerForm({ ...editCustomerForm, first_name: e.target.value })}
+                          placeholder="First name"
+                        />
+                      </div>
+                      <div className="form-group">
+                        <label className="form-label">Last Name</label>
+                        <input
+                          type="text"
+                          className="form-input"
+                          value={editCustomerForm.last_name}
+                          onChange={(e) => setEditCustomerForm({ ...editCustomerForm, last_name: e.target.value })}
+                          placeholder="Last name"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid-cols-3">
+                      <div className="form-group">
+                        <label className="form-label">Mobile Phone *</label>
+                        <input
+                          type="tel"
+                          className="form-input"
+                          required
+                          value={editCustomerForm.phone}
+                          onChange={(e) => setEditCustomerForm({ ...editCustomerForm, phone: e.target.value })}
+                          placeholder="Mobile number"
+                        />
+                      </div>
+                      <div className="form-group">
+                        <label className="form-label">Age (Years)</label>
+                        <input
+                          type="number"
+                          min="1"
+                          max="120"
+                          className="form-input"
+                          placeholder="e.g. 30"
+                          value={editCustomerForm.age}
+                          onChange={(e) => handleEditAgeChange(e.target.value)}
+                        />
+                      </div>
+                      <div className="form-group">
+                        <label className="form-label">Gender</label>
+                        <select
+                          className="form-select"
+                          value={editCustomerForm.gender}
+                          onChange={(e) => setEditCustomerForm({ ...editCustomerForm, gender: e.target.value })}
+                        >
+                          <option value="male">Male</option>
+                          <option value="female">Female</option>
+                          <option value="other">Other</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div className="grid-cols-2">
+                      <div className="form-group">
+                        <label className="form-label">City / Town</label>
+                        <input
+                          type="text"
+                          className="form-input"
+                          value={editCustomerForm.city}
+                          onChange={(e) => setEditCustomerForm({ ...editCustomerForm, city: e.target.value })}
+                          placeholder="City"
+                        />
+                      </div>
+                      <div className="form-group">
+                        <label className="form-label">Address Line</label>
+                        <input
+                          type="text"
+                          className="form-input"
+                          value={editCustomerForm.address_line1}
+                          onChange={(e) => setEditCustomerForm({ ...editCustomerForm, address_line1: e.target.value })}
+                          placeholder="Street / Area"
+                        />
+                      </div>
+                    </div>
+
+                    <div style={{ display: 'flex', gap: '10px', marginTop: '12px', justifyContent: 'flex-end' }}>
+                      <button
+                        type="button"
+                        className="btn btn-secondary btn-sm"
+                        onClick={() => setIsEditingCustomer(false)}
+                        disabled={isUpdatingCust}
+                      >
+                        {t('Cancel')}
+                      </button>
+                      <button
+                        type="button"
+                        className="btn btn-primary btn-sm"
+                        onClick={handleSaveCustomerUpdate}
+                        disabled={isUpdatingCust}
+                      >
+                        <Save size={14} />
+                        <span>{isUpdatingCust ? t('Saving...') : t('Save & Update Customer')}</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              /* Display Banner */
+              <div
+                style={{
+                  backgroundColor: 'var(--primary-subtle)',
+                  border: '1px solid var(--primary-border)',
+                  borderRadius: 'var(--radius-lg)',
+                  padding: '16px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '16px',
+                }}
+              >
+                <div
+                  style={{
+                    width: '56px',
+                    height: '56px',
+                    borderRadius: 'var(--radius-full)',
+                    backgroundColor: 'var(--primary)',
+                    color: '#fff',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontWeight: 800,
+                    fontSize: '1.3rem',
+                    overflow: 'hidden',
+                  }}
+                >
+                  {selectedCustomer.profile_image_url ? (
+                    <img
+                      src={selectedCustomer.profile_image_url}
+                      alt={selectedCustomer.first_name}
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    />
+                  ) : (
+                    selectedCustomer.first_name.charAt(0).toUpperCase()
                   )}
                 </div>
-                <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '4px' }}>
-                  📞 {selectedCustomer.phone || 'N/A'} &nbsp;|&nbsp; 📍 {selectedCustomer.address_line1 || selectedCustomer.city || 'N/A'}
-                </p>
+                <div style={{ flex: 1 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                    <h3 style={{ fontSize: '1.1rem', fontWeight: 700, margin: 0 }}>
+                      {selectedCustomer.first_name} {selectedCustomer.last_name}
+                    </h3>
+                    <span className="badge badge-ready" style={{ fontSize: '0.72rem' }}>
+                      <UserCheck size={12} /> Existing Customer
+                    </span>
+                    {selectedCustomer.gender && (
+                      <span className="badge badge-in_lab" style={{ fontSize: '0.72rem', textTransform: 'capitalize' }}>
+                        {selectedCustomer.gender}
+                      </span>
+                    )}
+                    {selectedCustomer.date_of_birth && (
+                      <span className="badge badge-fitting" style={{ fontSize: '0.72rem' }}>
+                        Age: {calculateAge(selectedCustomer.date_of_birth)} yrs
+                      </span>
+                    )}
+                  </div>
+                  <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '4px' }}>
+                    📞 {selectedCustomer.phone || 'N/A'} &nbsp;|&nbsp; 📍 {selectedCustomer.address_line1 || selectedCustomer.city || 'N/A'}
+                  </p>
+                </div>
+                <div style={{ textAlign: 'right' }}>
+                  <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Total Spent</span>
+                  <p style={{ fontWeight: 800, color: 'var(--primary-hover)', fontSize: '1.05rem', margin: 0 }}>
+                    ₹{Number(selectedCustomer.total_spent || 0).toLocaleString()}
+                  </p>
+                </div>
               </div>
-              <div style={{ textAlign: 'right' }}>
-                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Total Spent</span>
-                <p style={{ fontWeight: 800, color: 'var(--primary-hover)', fontSize: '1.05rem', margin: 0 }}>
-                  ₹{Number(selectedCustomer.total_spent || 0).toLocaleString()}
-                </p>
-              </div>
-            </div>
+            )
           ) : (
             /* Inline Customer Fields */
             <div>
               <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', alignItems: 'flex-start' }}>
                 {/* Photo Upload Thumbnail / Snapshot button */}
-                <div style={{ textAlign: 'center' }}>
+                <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px' }}>
                   <div
-                    onClick={() => setIsCustCameraOpen(true)}
+                    onClick={() => {
+                      setCameraTarget('new');
+                      setIsCustCameraOpen(true);
+                    }}
                     style={{
                       width: '84px',
                       height: '84px',
@@ -991,6 +1323,18 @@ export default function NewOrderPage() {
                       </>
                     )}
                   </div>
+
+                  {customerForm.profile_image_url && (
+                    <button
+                      type="button"
+                      className="btn btn-secondary btn-sm"
+                      style={{ fontSize: '0.72rem', padding: '3px 8px', color: 'var(--danger)', borderColor: 'var(--danger-border, #fca5a5)' }}
+                      onClick={() => setCustomerForm((prev) => ({ ...prev, profile_image_url: '' }))}
+                      title="Remove customer photo"
+                    >
+                      <Trash2 size={12} /> Remove
+                    </button>
+                  )}
                 </div>
 
                 {/* Name, Phone, Age, and Gender Inputs */}
@@ -2305,8 +2649,14 @@ export default function NewOrderPage() {
       <CameraCaptureModal
         isOpen={isCustCameraOpen}
         onClose={() => setIsCustCameraOpen(false)}
-        onPhotoSelected={(url) => setCustomerForm((prev) => ({ ...prev, profile_image_url: url }))}
-        title="Take Live Customer Photo"
+        onPhotoSelected={(url) => {
+          if (cameraTarget === 'edit') {
+            setEditCustomerForm((prev) => ({ ...prev, profile_image_url: url }));
+          } else {
+            setCustomerForm((prev) => ({ ...prev, profile_image_url: url }));
+          }
+        }}
+        title="Customer Profile Photo"
       />
     </div>
   );

@@ -4,6 +4,7 @@ import React from 'react';
 import { useTranslation } from '../lib/i18n/TranslationContext';
 import { Printer, Download, ArrowLeft, Stethoscope, Building2 } from 'lucide-react';
 import { Order, OrderItem, OrderPrescription, Shop } from '../lib/types';
+import { api } from '../lib/api';
 
 interface InvoiceViewProps {
   order: Order;
@@ -21,6 +22,21 @@ export const InvoiceView: React.FC<InvoiceViewProps> = ({
   onBack,
 }) => {
   const { t } = useTranslation();
+  const [signatory, setSignatory] = React.useState<string>(shop?.authorized_signatory || '');
+
+  React.useEffect(() => {
+    if (shop?.authorized_signatory) {
+      setSignatory(shop.authorized_signatory);
+    } else {
+      api.getSettings().then((res) => {
+        if (res.success && res.data?.authorized_signatory) {
+          setSignatory(res.data.authorized_signatory);
+        } else {
+          setSignatory('Divya Maurya');
+        }
+      });
+    }
+  }, [shop]);
 
   const handlePrint = () => {
     window.print();
@@ -74,50 +90,52 @@ export const InvoiceView: React.FC<InvoiceViewProps> = ({
 
       {/* Invoice Document Layout */}
       <div className="invoice-card" id="printable-invoice">
-        {/* Header */}
-        <div className="invoice-header">
-          <div>
-            <h1 style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--primary-hover)' }}>
-              {shop?.name || 'OptiSuite Optical Shop'}
+        {/* Header Layout: Left: Shop Logo, Center: Divya Optical Shop, Right: Receipt S.No */}
+        <div className="receipt-header-top">
+          {/* Left: Shop Logo */}
+          <div style={{ flex: '0 0 92px', display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
+            <img
+              src={shop?.logo_url || '/logo.png'}
+              alt={shop?.name || 'Divya Optical Shop'}
+              className="receipt-logo"
+            />
+          </div>
+
+          {/* Center: Divya Optical Shop */}
+          <div style={{ flex: 1, textAlign: 'center', padding: '0 10px' }}>
+            <h1 style={{ fontSize: '1.55rem', fontWeight: 900, color: '#0f172a', margin: '0 0 4px 0', letterSpacing: '0.02em', textTransform: 'uppercase' }}>
+              {shop?.name || 'Divya Optical Shop'}
             </h1>
-            <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '4px' }}>
-              {shop?.address_line1} {shop?.address_line2 ? `, ${shop.address_line2}` : ''}
-              {shop?.city ? `, ${shop.city}` : ''} {shop?.state ? ` - ${shop.state}` : ''} {shop?.pin_code}
+            <p style={{ fontSize: '0.84rem', color: '#475569', margin: '2px 0', lineHeight: 1.35 }}>
+              {shop?.address_line1 || ''}{shop?.address_line2 ? `, ${shop.address_line2}` : ''}
+              {shop?.city ? `, ${shop.city}` : ''}{shop?.state ? ` - ${shop.state}` : ''} {shop?.pin_code ? `(${shop.pin_code})` : ''}
             </p>
-            <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-              {t('Phone')}: {shop?.phone || 'N/A'} | {t('Email')}: {shop?.email || 'N/A'}
+            <p style={{ fontSize: '0.82rem', color: '#475569', margin: '2px 0' }}>
+              📞 {t('Phone')}: {shop?.phone || '+91 9876543210'} &nbsp;|&nbsp; ✉️ {t('Email')}: {shop?.email || 'contact@divyaoptical.com'}
             </p>
             {shop?.gstin && (
-              <p style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-main)', marginTop: '2px' }}>
+              <p style={{ fontSize: '0.82rem', fontWeight: 700, color: '#0f172a', margin: '2px 0' }}>
                 GSTIN: {shop.gstin}
               </p>
             )}
           </div>
-          <div style={{ textAlign: 'right' }}>
-            <span
-              style={{
-                fontSize: '0.75rem',
-                fontWeight: 700,
-                textTransform: 'uppercase',
-                padding: '4px 10px',
-                borderRadius: 'var(--radius-sm)',
-                backgroundColor: 'var(--primary-light)',
-                color: 'var(--primary-hover)',
-              }}
-            >
-              {t('Tax Invoice / Optical Prescription')}
-            </span>
-            <p style={{ fontSize: '1.1rem', fontWeight: 800, marginTop: '8px', color: 'var(--text-main)' }}>
-              #{order.order_number}
-            </p>
-            <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-              {t('Date')}: {new Date(order.created_at).toLocaleDateString()}
-            </p>
-            {order.expected_delivery && (
-              <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-                {t('Delivery Due')}: {new Date(order.expected_delivery).toLocaleDateString()}
-              </p>
-            )}
+
+          {/* Right: Receipt S.No */}
+          <div style={{ flex: '0 0 170px', textAlign: 'right', display: 'flex', flexDirection: 'column', alignItems: 'flex-end', justifyContent: 'center' }}>
+            <div style={{ backgroundColor: '#f1f5f9', border: '1.5px solid #cbd5e1', borderRadius: '8px', padding: '8px 12px', textAlign: 'center', width: '100%' }}>
+              <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block' }}>
+                Receipt S.No
+              </span>
+              <span style={{ fontSize: '1.15rem', fontWeight: 900, color: '#0f172a', fontFamily: 'monospace', display: 'block', marginTop: '2px' }}>
+                #{order.order_number || `ORD-${order.id}`}
+              </span>
+            </div>
+            <div style={{ fontSize: '0.8rem', color: '#64748b', marginTop: '6px', textAlign: 'right' }}>
+              <div><strong>{t('Date')}:</strong> {new Date(order.created_at || Date.now()).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</div>
+              {order.expected_delivery && (
+                <div style={{ marginTop: '2px' }}><strong>{t('Delivery Due')}:</strong> {new Date(order.expected_delivery).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</div>
+              )}
+            </div>
           </div>
         </div>
 
@@ -338,10 +356,19 @@ export const InvoiceView: React.FC<InvoiceViewProps> = ({
                 '1. Goods once sold will not be taken back.\n2. Warranty covers manufacturing defects only on frames/coatings.\n3. Please inspect power and fitting at the time of delivery.'}
             </p>
           </div>
-          <div style={{ textAlign: 'center' }}>
-            <div style={{ height: '40px' }} />
-            <div style={{ borderTop: '1px solid var(--text-subtle)', width: '140px', paddingTop: '4px' }}>
-              <p style={{ fontSize: '0.75rem', fontWeight: 600 }}>{t('Authorized Signatory')}</p>
+          <div style={{ textAlign: 'center', minWidth: '180px' }}>
+            <div style={{ minHeight: '38px', display: 'flex', alignItems: 'flex-end', justifyContent: 'center', marginBottom: '4px' }}>
+              <span className="receipt-signature-name">
+                {signatory || shop?.authorized_signatory || 'Divya Maurya'}
+              </span>
+            </div>
+            <div style={{ borderTop: '1.5px solid #334155', width: '100%', paddingTop: '4px' }}>
+              <p style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', color: '#334155', margin: 0, letterSpacing: '0.04em' }}>
+                {t('Authorized Signatory')}
+              </p>
+              <p style={{ fontSize: '0.72rem', color: '#64748b', margin: '2px 0 0 0', fontWeight: 500 }}>
+                {signatory || shop?.authorized_signatory || 'Divya Maurya'}
+              </p>
             </div>
           </div>
         </div>

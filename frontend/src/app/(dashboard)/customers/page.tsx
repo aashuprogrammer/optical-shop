@@ -18,6 +18,8 @@ import {
   Camera,
   Trash2,
   User as UserIcon,
+  Edit,
+  Save,
 } from 'lucide-react';
 import { Customer } from '@/lib/types';
 
@@ -32,6 +34,7 @@ export default function CustomersPage() {
 
   // Modals state
   const [isAddOpen, setIsAddOpen] = useState<boolean>(false);
+  const [isEditOpen, setIsEditOpen] = useState<boolean>(false);
   const [isCameraOpen, setIsCameraOpen] = useState<boolean>(false);
   const [selectedCustomerId, setSelectedCustomerId] = useState<number | null>(null);
   const [customerDetail, setCustomerDetail] = useState<any>(null);
@@ -54,11 +57,30 @@ export default function CustomersPage() {
     notes: '',
   });
 
-  const [cameraContext, setCameraContext] = useState<'create' | 'update'>('create');
+  // Edit Customer Form State
+  const [editFormData, setEditFormData] = useState({
+    first_name: '',
+    last_name: '',
+    phone: '',
+    email: '',
+    date_of_birth: '',
+    age: '',
+    gender: 'male',
+    address_line1: '',
+    city: '',
+    state: '',
+    pin_code: '',
+    profile_image_url: '',
+    notes: '',
+  });
+
+  const [cameraContext, setCameraContext] = useState<'create' | 'update' | 'edit'>('create');
 
   const handlePhotoSelected = async (url: string) => {
     if (cameraContext === 'create') {
       setFormData((prev) => ({ ...prev, profile_image_url: url }));
+    } else if (cameraContext === 'edit') {
+      setEditFormData((prev) => ({ ...prev, profile_image_url: url }));
     } else if (cameraContext === 'update' && customerDetail) {
       const updatedCustomer = {
         ...customerDetail.customer,
@@ -71,6 +93,83 @@ export default function CustomersPage() {
       } else {
         alert(res.error || 'Failed to update customer photo');
       }
+    }
+  };
+
+  const handleRemovePhoto = async () => {
+    if (!customerDetail) return;
+    if (!confirm('Are you sure you want to remove this customer\'s profile photo?')) return;
+    const updatedCustomer = {
+      ...customerDetail.customer,
+      profile_image_url: '',
+    };
+    const res = await api.updateCustomer(customerDetail.customer.id, updatedCustomer);
+    if (res.success) {
+      openCustomerDetail(customerDetail.customer.id);
+      loadCustomers();
+    } else {
+      alert(res.error || 'Failed to remove customer photo');
+    }
+  };
+
+  const handleOpenEditCustomer = () => {
+    if (!customerDetail) return;
+    const c = customerDetail.customer;
+    const age = calculateAge(c.date_of_birth);
+    setEditFormData({
+      first_name: c.first_name || '',
+      last_name: c.last_name || '',
+      phone: c.phone || '',
+      email: c.email || '',
+      date_of_birth: c.date_of_birth || '',
+      age: age.replace(/[^0-9]/g, ''),
+      gender: c.gender || 'male',
+      address_line1: c.address_line1 || '',
+      city: c.city || '',
+      state: c.state || '',
+      pin_code: c.pin_code || '',
+      profile_image_url: c.profile_image_url || '',
+      notes: c.notes || '',
+    });
+    setIsEditOpen(true);
+  };
+
+  const handleEditAgeChange = (ageVal: string) => {
+    setEditFormData((prev) => {
+      const numAge = parseInt(ageVal, 10);
+      let calculatedDob = prev.date_of_birth;
+      if (!isNaN(numAge) && numAge >= 0 && numAge <= 120) {
+        const year = new Date().getFullYear() - numAge;
+        calculatedDob = `${year}-01-01`;
+      }
+      return { ...prev, age: ageVal, date_of_birth: calculatedDob };
+    });
+  };
+
+  const handleEditDobChange = (dobVal: string) => {
+    setEditFormData((prev) => {
+      let calculatedAge = prev.age;
+      if (dobVal) {
+        const birthDate = new Date(dobVal);
+        if (!isNaN(birthDate.getTime())) {
+          const age = new Date().getFullYear() - birthDate.getFullYear();
+          calculatedAge = age.toString();
+        }
+      }
+      return { ...prev, date_of_birth: dobVal, age: calculatedAge };
+    });
+  };
+
+  const handleUpdateCustomerSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!customerDetail) return;
+    const res = await api.updateCustomer(customerDetail.customer.id, editFormData);
+    if (res.success) {
+      setIsEditOpen(false);
+      openCustomerDetail(customerDetail.customer.id);
+      loadCustomers();
+    } else {
+      alert(res.error || 'Failed to update customer');
     }
   };
 
@@ -688,16 +787,36 @@ export default function CustomersPage() {
                   <div style={{ fontWeight: 700, fontSize: '1.1rem' }}>
                     {customerDetail.customer.first_name} {customerDetail.customer.last_name || ''}
                   </div>
-                  <button
-                    type="button"
-                    className="btn btn-secondary btn-sm"
-                    onClick={() => {
-                      setCameraContext('update');
-                      setIsCameraOpen(true);
-                    }}
-                  >
-                    <Camera size={13} /> Update Photo
-                  </button>
+                  <div style={{ display: 'flex', gap: '6px', alignItems: 'center', flexWrap: 'wrap' }}>
+                    <button
+                      type="button"
+                      className="btn btn-secondary btn-sm"
+                      onClick={() => {
+                        setCameraContext('update');
+                        setIsCameraOpen(true);
+                      }}
+                    >
+                      <Camera size={13} /> Update Photo
+                    </button>
+                    {customerDetail.customer.profile_image_url && (
+                      <button
+                        type="button"
+                        className="btn btn-secondary btn-sm"
+                        style={{ color: 'var(--danger)', borderColor: 'var(--danger-border, #fca5a5)' }}
+                        onClick={handleRemovePhoto}
+                        title="Remove customer profile photo"
+                      >
+                        <Trash2 size={13} /> Remove Photo
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      className="btn btn-primary btn-sm"
+                      onClick={handleOpenEditCustomer}
+                    >
+                      <Edit size={13} /> Edit Customer
+                    </button>
+                  </div>
                 </div>
                 <div style={{ fontSize: '0.84rem', color: 'var(--text-muted)', display: 'flex', gap: '12px', marginTop: '4px', flexWrap: 'wrap' }}>
                   <span><strong>Age:</strong> {calculateAge(customerDetail.customer.date_of_birth)}</span>
@@ -804,6 +923,191 @@ export default function CustomersPage() {
           </div>
         </Modal>
       )}
+
+      {/* Edit Customer Modal */}
+      <Modal
+        isOpen={isEditOpen}
+        onClose={() => setIsEditOpen(false)}
+        title="Edit Customer Information"
+        maxWidth="620px"
+      >
+        <form onSubmit={handleUpdateCustomerSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+          {/* Photo & Snapshot Section */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '10px 0', borderBottom: '1px solid var(--border)' }}>
+            <div
+              style={{
+                width: '64px',
+                height: '64px',
+                borderRadius: 'var(--radius-full)',
+                backgroundColor: 'var(--primary-light)',
+                color: 'var(--primary)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontWeight: 700,
+                fontSize: '1.4rem',
+                overflow: 'hidden',
+                border: '2px solid var(--primary-border)',
+                flexShrink: 0,
+              }}
+            >
+              {editFormData.profile_image_url ? (
+                <img
+                  src={editFormData.profile_image_url}
+                  alt="Customer Photo"
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                />
+              ) : (
+                <UserIcon size={28} />
+              )}
+            </div>
+
+            <div>
+              <div style={{ fontWeight: 600, fontSize: '0.9rem', marginBottom: '6px' }}>Customer Profile Photo</div>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <button
+                  type="button"
+                  className="btn btn-secondary btn-sm"
+                  onClick={() => {
+                    setCameraContext('edit');
+                    setIsCameraOpen(true);
+                  }}
+                >
+                  <Camera size={14} /> Change Photo
+                </button>
+                {editFormData.profile_image_url && (
+                  <button
+                    type="button"
+                    className="btn btn-secondary btn-sm"
+                    style={{ color: 'var(--danger)', borderColor: 'var(--danger-border, #fca5a5)' }}
+                    onClick={() => setEditFormData({ ...editFormData, profile_image_url: '' })}
+                  >
+                    <Trash2 size={13} /> Remove Photo
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div className="grid-cols-2">
+            <div className="form-group">
+              <label className="form-label">First Name *</label>
+              <input
+                type="text"
+                className="form-input"
+                required
+                value={editFormData.first_name}
+                onChange={(e) => setEditFormData({ ...editFormData, first_name: e.target.value })}
+              />
+            </div>
+            <div className="form-group">
+              <label className="form-label">Last Name</label>
+              <input
+                type="text"
+                className="form-input"
+                value={editFormData.last_name}
+                onChange={(e) => setEditFormData({ ...editFormData, last_name: e.target.value })}
+              />
+            </div>
+          </div>
+
+          <div className="grid-cols-2">
+            <div className="form-group">
+              <label className="form-label">Mobile Phone *</label>
+              <input
+                type="tel"
+                className="form-input"
+                required
+                value={editFormData.phone}
+                onChange={(e) => setEditFormData({ ...editFormData, phone: e.target.value })}
+              />
+            </div>
+            <div className="form-group">
+              <label className="form-label">Email</label>
+              <input
+                type="email"
+                className="form-input"
+                value={editFormData.email}
+                onChange={(e) => setEditFormData({ ...editFormData, email: e.target.value })}
+              />
+            </div>
+          </div>
+
+          <div className="grid-cols-3">
+            <div className="form-group">
+              <label className="form-label">Age (Years)</label>
+              <input
+                type="number"
+                min="0"
+                max="120"
+                className="form-input"
+                value={editFormData.age}
+                onChange={(e) => handleEditAgeChange(e.target.value)}
+              />
+            </div>
+            <div className="form-group">
+              <label className="form-label">Date of Birth</label>
+              <input
+                type="date"
+                className="form-input"
+                value={editFormData.date_of_birth}
+                onChange={(e) => handleEditDobChange(e.target.value)}
+              />
+            </div>
+            <div className="form-group">
+              <label className="form-label">Gender</label>
+              <select
+                className="form-select"
+                value={editFormData.gender}
+                onChange={(e) => setEditFormData({ ...editFormData, gender: e.target.value })}
+              >
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="grid-cols-2">
+            <div className="form-group">
+              <label className="form-label">Address Line 1</label>
+              <input
+                type="text"
+                className="form-input"
+                value={editFormData.address_line1}
+                onChange={(e) => setEditFormData({ ...editFormData, address_line1: e.target.value })}
+              />
+            </div>
+            <div className="form-group">
+              <label className="form-label">City</label>
+              <input
+                type="text"
+                className="form-input"
+                value={editFormData.city}
+                onChange={(e) => setEditFormData({ ...editFormData, city: e.target.value })}
+              />
+            </div>
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">Notes</label>
+            <textarea
+              className="form-textarea"
+              value={editFormData.notes}
+              onChange={(e) => setEditFormData({ ...editFormData, notes: e.target.value })}
+            />
+          </div>
+
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '16px' }}>
+            <button type="button" className="btn btn-secondary" onClick={() => setIsEditOpen(false)}>
+              Cancel
+            </button>
+            <button type="submit" className="btn btn-primary">
+              <Save size={16} /> Save Changes
+            </button>
+          </div>
+        </form>
+      </Modal>
     </div>
   );
 }

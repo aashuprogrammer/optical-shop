@@ -8,13 +8,27 @@ import {
   LayoutDashboard,
   Users,
   Plus,
-  Glasses,
   ShoppingBag,
+  Menu,
 } from 'lucide-react';
 
 export const BottomNav: React.FC = () => {
   const pathname = usePathname();
   const { t } = useTranslation();
+
+  const handleOpenMore = (e: React.MouseEvent) => {
+    e.preventDefault();
+    window.dispatchEvent(new Event('open_mobile_nav'));
+  };
+
+  const isMoreActive =
+    pathname.startsWith('/repairs') ||
+    pathname.startsWith('/eye-tests') ||
+    pathname.startsWith('/expenses') ||
+    pathname.startsWith('/reports') ||
+    pathname.startsWith('/products') ||
+    pathname.startsWith('/purchases') ||
+    pathname.startsWith('/settings');
 
   return (
     <nav className="bottom-nav">
@@ -47,13 +61,17 @@ export const BottomNav: React.FC = () => {
         <span>{t('Orders')}</span>
       </Link>
 
-      <Link
-        href="/products"
-        className={`bottom-nav-item ${pathname.startsWith('/products') ? 'active' : ''}`}
+      {/* Full Features Drawer Trigger */}
+      <button
+        type="button"
+        onClick={handleOpenMore}
+        className={`bottom-nav-item ${isMoreActive ? 'active' : ''}`}
+        style={{ background: 'none', border: 'none', cursor: 'pointer' }}
+        title={t('All Features & More')}
       >
-        <Glasses size={20} />
-        <span>{t('Inventory')}</span>
-      </Link>
+        <Menu size={20} />
+        <span>{t('More')}</span>
+      </button>
     </nav>
   );
 };

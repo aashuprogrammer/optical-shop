@@ -15,6 +15,8 @@ import {
   Clock,
   PlusCircle,
   UserPlus,
+  Wrench,
+  Receipt,
 } from 'lucide-react';
 import { DashboardStats, Order } from '@/lib/types';
 
@@ -258,7 +260,7 @@ export default function DashboardPage() {
         <h3 className="card-title" style={{ marginBottom: '16px' }}>
           {t('Quick Management Shortcuts')}
         </h3>
-        <div className="grid-cols-4">
+        <div className="grid-cols-3" style={{ gap: '14px' }}>
           <Link
             href="/orders/new"
             style={{
@@ -269,6 +271,7 @@ export default function DashboardPage() {
               alignItems: 'center',
               gap: '12px',
               backgroundColor: 'var(--bg-muted)',
+              transition: 'all 0.15s ease',
             }}
           >
             <div style={{ backgroundColor: 'var(--primary-light)', color: 'var(--primary-hover)', padding: '10px', borderRadius: 'var(--radius-md)' }}>
@@ -277,6 +280,28 @@ export default function DashboardPage() {
             <div>
               <p style={{ fontWeight: 700, fontSize: '0.9rem' }}>{t('POS Billing')}</p>
               <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{t('Generate bill & Rx')}</p>
+            </div>
+          </Link>
+
+          <Link
+            href="/repairs"
+            style={{
+              padding: '16px',
+              borderRadius: 'var(--radius-md)',
+              border: '1px solid var(--border)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              backgroundColor: 'var(--bg-muted)',
+              transition: 'all 0.15s ease',
+            }}
+          >
+            <div style={{ backgroundColor: 'var(--warning-bg)', color: 'var(--warning)', padding: '10px', borderRadius: 'var(--radius-md)' }}>
+              <Wrench size={20} />
+            </div>
+            <div>
+              <p style={{ fontWeight: 700, fontSize: '0.9rem' }}>{t('Repairs & Services')}</p>
+              <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{t('Frame fix & replacement')}</p>
             </div>
           </Link>
 
@@ -290,6 +315,7 @@ export default function DashboardPage() {
               alignItems: 'center',
               gap: '12px',
               backgroundColor: 'var(--bg-muted)',
+              transition: 'all 0.15s ease',
             }}
           >
             <div style={{ backgroundColor: 'var(--info-bg)', color: 'var(--info)', padding: '10px', borderRadius: 'var(--radius-md)' }}>
@@ -311,6 +337,7 @@ export default function DashboardPage() {
               alignItems: 'center',
               gap: '12px',
               backgroundColor: 'var(--bg-muted)',
+              transition: 'all 0.15s ease',
             }}
           >
             <div style={{ backgroundColor: 'var(--purple-bg)', color: 'var(--purple)', padding: '10px', borderRadius: 'var(--radius-md)' }}>
@@ -319,6 +346,28 @@ export default function DashboardPage() {
             <div>
               <p style={{ fontWeight: 700, fontSize: '0.9rem' }}>{t('Inventory & Frames')}</p>
               <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{t('Manage stock & lenses')}</p>
+            </div>
+          </Link>
+
+          <Link
+            href="/expenses"
+            style={{
+              padding: '16px',
+              borderRadius: 'var(--radius-md)',
+              border: '1px solid var(--border)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              backgroundColor: 'var(--bg-muted)',
+              transition: 'all 0.15s ease',
+            }}
+          >
+            <div style={{ backgroundColor: 'var(--danger-bg, #fee2e2)', color: 'var(--danger, #ef4444)', padding: '10px', borderRadius: 'var(--radius-md)' }}>
+              <Receipt size={20} />
+            </div>
+            <div>
+              <p style={{ fontWeight: 700, fontSize: '0.9rem' }}>{t('Expense Tracker')}</p>
+              <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{t('Daily shop expenses')}</p>
             </div>
           </Link>
 
@@ -332,13 +381,14 @@ export default function DashboardPage() {
               alignItems: 'center',
               gap: '12px',
               backgroundColor: 'var(--bg-muted)',
+              transition: 'all 0.15s ease',
             }}
           >
             <div style={{ backgroundColor: 'var(--success-bg)', color: 'var(--success)', padding: '10px', borderRadius: 'var(--radius-md)' }}>
               <IndianRupee size={20} />
             </div>
             <div>
-              <p style={{ fontWeight: 700, fontSize: '0.9rem' }}>{t('GST Reports')}</p>
+              <p style={{ fontWeight: 700, fontSize: '0.9rem' }}>{t('GST & Sales Reports')}</p>
               <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{t('Tax & sales summary')}</p>
             </div>
           </Link>

@@ -3,6 +3,7 @@
 import React from 'react';
 import { Printer, Download, ArrowLeft, Building2, Stethoscope, Eye, User, Phone, MapPin, Calendar, Hash, FileText } from 'lucide-react';
 import { Order, OrderItem, OrderPrescription, Shop } from '../lib/types';
+import { api } from '../lib/api';
 
 interface LabReceiptViewProps {
   order: Order;
@@ -19,6 +20,22 @@ export const LabReceiptView: React.FC<LabReceiptViewProps> = ({
   shop,
   onBack,
 }) => {
+  const [signatory, setSignatory] = React.useState<string>(shop?.authorized_signatory || '');
+
+  React.useEffect(() => {
+    if (shop?.authorized_signatory) {
+      setSignatory(shop.authorized_signatory);
+    } else {
+      api.getSettings().then((res) => {
+        if (res.success && res.data?.authorized_signatory) {
+          setSignatory(res.data.authorized_signatory);
+        } else {
+          setSignatory('Divya Maurya');
+        }
+      });
+    }
+  }, [shop]);
+
   const handlePrint = () => {
     window.print();
   };
@@ -125,7 +142,7 @@ export const LabReceiptView: React.FC<LabReceiptViewProps> = ({
     'Consulting Optometrist';
 
   // Shop Owner / Business Name
-  const shopOwnerName = shop?.name || 'Optical Store';
+  const shopOwnerName = shop?.name || 'Divya Optical Shop';
 
   // Customer Full Address
   const customerAddress =
@@ -190,58 +207,82 @@ export const LabReceiptView: React.FC<LabReceiptViewProps> = ({
           fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
         }}
       >
-        {/* Document Banner */}
+        {/* Header Layout: Left: Shop Logo, Center: Divya Optical Shop, Right: Receipt S.No */}
         <div
           style={{
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
             borderBottom: '2px solid #111827',
-            paddingBottom: '14px',
-            marginBottom: '16px',
+            paddingBottom: '16px',
+            marginBottom: '18px',
+            gap: '16px',
           }}
         >
-          <div>
+          {/* Left: Shop Logo */}
+          <div style={{ flex: '0 0 92px', display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
+            <img
+              src={shop?.logo_url || '/logo.png'}
+              alt={shopOwnerName}
+              className="receipt-logo"
+            />
+          </div>
+
+          {/* Center: Divya Optical Shop */}
+          <div style={{ flex: 1, textAlign: 'center', padding: '0 10px' }}>
             <span
               style={{
                 display: 'inline-block',
                 backgroundColor: '#111827',
                 color: '#ffffff',
                 fontWeight: 800,
-                fontSize: '0.82rem',
+                fontSize: '0.75rem',
                 letterSpacing: '0.08em',
-                padding: '4px 10px',
+                padding: '3px 10px',
                 borderRadius: '4px',
                 textTransform: 'uppercase',
                 marginBottom: '6px',
               }}
             >
-              EXTERNAL LAB ORDER & JOB SLIP
+              EXTERNAL LAB WORK ORDER & RX SPECIFICATIONS
             </span>
-            <h1 style={{ fontSize: '1.45rem', fontWeight: 800, color: '#111827', margin: 0 }}>
+            <h1 style={{ fontSize: '1.5rem', fontWeight: 900, color: '#111827', margin: '0 0 4px 0', letterSpacing: '0.02em', textTransform: 'uppercase' }}>
               {shopOwnerName}
             </h1>
+            <p style={{ fontSize: '0.84rem', color: '#4b5563', margin: '2px 0', lineHeight: 1.35 }}>
+              {shop?.address_line1 || ''}{shop?.address_line2 ? `, ${shop.address_line2}` : ''}
+              {shop?.city ? `, ${shop.city}` : ''}{shop?.state ? ` - ${shop.state}` : ''} {shop?.pin_code ? `(${shop.pin_code})` : ''}
+            </p>
+            <p style={{ fontSize: '0.82rem', color: '#4b5563', margin: '2px 0' }}>
+              📞 <strong>Phone:</strong> {shop?.phone || '+91 9876543210'} &nbsp;|&nbsp; ✉️ <strong>Email:</strong> {shop?.email || 'contact@divyaoptical.com'}
+            </p>
           </div>
-          <div style={{ textAlign: 'right' }}>
+
+          {/* Right: Receipt S.No */}
+          <div style={{ flex: '0 0 170px', textAlign: 'right', display: 'flex', flexDirection: 'column', alignItems: 'flex-end', justifyContent: 'center' }}>
             <div
               style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '6px',
                 backgroundColor: '#f3f4f6',
-                padding: '6px 14px',
+                border: '1.5px solid #9ca3af',
                 borderRadius: '6px',
-                border: '1px solid #d1d5db',
+                padding: '8px 12px',
+                textAlign: 'center',
+                width: '100%',
               }}
             >
-              <Hash size={16} color="#111827" />
-              <span style={{ fontWeight: 800, fontSize: '1.05rem', fontFamily: 'monospace', letterSpacing: '0.04em' }}>
-                S. No: {serialNo}
+              <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#4b5563', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block' }}>
+                Receipt S.No
+              </span>
+              <span style={{ fontSize: '1.15rem', fontWeight: 900, color: '#111827', fontFamily: 'monospace', display: 'block', marginTop: '2px' }}>
+                #{serialNo}
               </span>
             </div>
-            <p style={{ fontSize: '0.82rem', color: '#4b5563', margin: '6px 0 0 0', fontWeight: 600 }}>
-              Date: {new Date(order.created_at || Date.now()).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
-            </p>
+            <div style={{ fontSize: '0.8rem', color: '#4b5563', margin: '6px 0 0 0', textAlign: 'right' }}>
+              <div><strong>Date:</strong> {new Date(order.created_at || Date.now()).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</div>
+              {order.expected_delivery && (
+                <div style={{ marginTop: '2px' }}><strong>Due:</strong> {new Date(order.expected_delivery).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</div>
+              )}
+            </div>
           </div>
         </div>
 
@@ -504,14 +545,23 @@ export const LabReceiptView: React.FC<LabReceiptViewProps> = ({
           }}
         >
           <div style={{ fontSize: '0.78rem', color: '#6b7280' }}>
-            <p style={{ margin: '2px 0' }}>Expected Delivery: <strong>{order.expected_delivery || 'Standard (2-3 days)'}</strong></p>
-            <p style={{ margin: '2px 0' }}>Generated by OptiSuite Optical System</p>
+            <p style={{ margin: '2px 0' }}>Expected Delivery: <strong>{order.expected_delivery ? new Date(order.expected_delivery).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : 'Standard (2-3 days)'}</strong></p>
+            <p style={{ margin: '2px 0' }}>Generated by Divya Optical Management System</p>
           </div>
-          <div style={{ textAlign: 'center', minWidth: '160px' }}>
-            <div style={{ borderBottom: '1px solid #111827', width: '100%', height: '32px', marginBottom: '4px' }} />
-            <span style={{ fontSize: '0.78rem', fontWeight: 700, color: '#111827' }}>
-              Authorized Signatory
-            </span>
+          <div style={{ textAlign: 'center', minWidth: '180px' }}>
+            <div style={{ minHeight: '38px', display: 'flex', alignItems: 'flex-end', justifyContent: 'center', marginBottom: '4px' }}>
+              <span className="receipt-signature-name">
+                {signatory || shop?.authorized_signatory || 'Divya Maurya'}
+              </span>
+            </div>
+            <div style={{ borderTop: '1.5px solid #111827', width: '100%', paddingTop: '4px' }}>
+              <p style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', color: '#111827', margin: 0, letterSpacing: '0.04em' }}>
+                Authorized Signatory
+              </p>
+              <p style={{ fontSize: '0.72rem', color: '#4b5563', margin: '2px 0 0 0', fontWeight: 500 }}>
+                {signatory || shop?.authorized_signatory || 'Divya Maurya'}
+              </p>
+            </div>
           </div>
         </div>
       </div>
